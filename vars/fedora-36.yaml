@@ -1,0 +1,21 @@
+---
+__postgresql_version: "14"
+__postgresql_data_dir: "/var/lib/pgsql/data"
+__postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"
+__postgresql_config_path: "/var/lib/pgsql/data"
+__postgresql_daemon: postgresql-{{ postgresql_version }}
+__postgresql_packages:
+  # needed for installing psycopg2
+  - python3-pip
+  - python3-devel
+  - cronie # dependency for managing crontab files on redhat
+  # - libpq-devel
+  - postgresql{{ postgresql_version }}-server
+  - postgresql{{ postgresql_version }}-contrib
+  - postgresql{{ postgresql_version }}-devel # works well for pgsql 11+, coincidentally pgsql 10- are no more supported
+  - nano
+  - pg_activity
+__postgresql_unix_socket_directories_mode: '0755'
+__postgresql_mirror_url: "{{ __postgresql_yum_mirror_url }}"
+
+__postgresql_service_path: /usr/lib/systemd/system/postgresql-{{ postgresql_version }}.service

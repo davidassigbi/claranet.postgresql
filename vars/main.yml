@@ -1,7 +1,0 @@
----
-# vars file for role
-
-_postgresql_default_databases:
-  - name: claranet
-
-_postgresql_databases: '{{ _postgresql_default_databases + postgresql_databases }}'

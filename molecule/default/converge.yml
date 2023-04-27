@@ -2,6 +2,7 @@
 - name: Converge
   hosts: all
   become: true
+  gather_facts: true
 
   vars:
     postgresql_databases:
@@ -18,7 +19,7 @@
   pre_tasks:
     # The Fedora 30+ container images have only C.UTF-8 installed
     - name: Set database locale if using Fedora 30+ or RedHat 8+
-      set_fact:
+      ansible.builtin.set_fact:
         postgresql_databases:
           - name: example
             lc_collate: 'C.UTF-8'
@@ -27,17 +28,19 @@
         - ( ansible_distribution == 'Fedora' and ansible_distribution_major_version >= '30') or
           ( ansible_os_family == 'RedHat' and ansible_distribution_major_version in ['8','9'])
 
-    - name: Update apt cache.
-      apt: update_cache=true cache_valid_time=600
-      changed_when: false
-      when: ansible_os_family == 'Debian'
+    # - name: Update apt cache.
+    #   ansible.builtin.apt:
+    #     update_cache: true
+    #     cache_valid_time: 600
+    #   changed_when: false
+    #   when: ansible_os_family == 'Debian'
 
   roles:
-    - role: geerlingguy.postgresql
+    - role: claranet.postgresql
 
-  post_tasks:
-    - name: Verify postgres is running.
-      command: "{{ postgresql_bin_path }}/pg_ctl -D {{ postgresql_data_dir }} status"
-      changed_when: false
-      become: true
-      become_user: postgres
+  # post_tasks:
+  #   - name: Ensure postgres is running.
+  #     ansible.builtin.command: "{{ postgresql_bin_path }}/pg_ctl -D {{ postgresql_data_dir }} status"
+  #     changed_when: false
+  #     become: true
+  #     become_user: postgres

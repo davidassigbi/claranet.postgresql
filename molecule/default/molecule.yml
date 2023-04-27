@@ -8,8 +8,11 @@ driver:
 platforms:
   # On "${name:-${image:-debian}", the last brace does not miss, it works like that...
   # The env var should be used when the image variable refers to a full registry path like registry.access.redhat.com/ubi8/ubi
-  - name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}
-    image: ${image:-debian}:${tag:-latest}
+  - &default
+    name: debian10
+    image: debian:10
+    # name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}
+    # image: ${image:-debian}:${tag:-latest}
     privileged: true
     tty: true
     volumes:
@@ -21,33 +24,48 @@ platforms:
       - SYS_TIME
       - LINUX_IMMUTABLE
     command: "/lib/systemd/systemd"
+    cgroupns_mode: host
 
-# Test replication
-# platforms:
-#   # On "${name:-${image:-debian}", the last brace does not miss, it works like that...
-#   # The env var should be used when the image variable refers to a full registry path like registry.access.redhat.com/ubi8/ubi
-#   - &instance
-#     name: claranet_ansifactory4_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}
-#     image: ${image:-debian}:${tag:-latest}
-#     privileged: true
-#     group:
-#       - cluster
-#     tty: true
-#     volumes:
-#       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-#       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-#     stop_signal: "SIGRTMIN+3"
-#     capabilities:
-#       - SYS_ADMIN
-#       - SYS_TIME
-#       - LINUX_IMMUTABLE
-#     command: "/lib/systemd/systemd"
-#   - <<: *instance
-#     name: claranet_ansifactory4_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2
-#   - <<: *instance
-#     name: claranet_ansifactory4_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
-#   - <<: *instance
-#     name: claranet_ansifactory4_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-4
+  - <<: *default
+    name: debian11
+    image: debian:11
+
+  - <<: *default
+    name: ubuntu18
+    image: ubuntu:18.04
+
+  - <<: *default
+    name: ubuntu20
+    image: ubuntu:20.04
+
+  - <<: *default
+    name: ubuntu22
+    image: ubuntu:22.04
+
+  # - <<: *default
+  #   name: centos8
+  #   image: quay.io/centos/centos:centos8
+  #   dockerfile: Dockerfile.centos8.j2
+
+  # - <<: *default
+  #   name: centosStream8
+  #   image: quay.io/centos/centos:stream8
+
+  - <<: *default
+    name: rocky8
+    image: rockylinux:8.7
+
+  - <<: *default
+    name: rocky9
+    image: rockylinux:9.1
+
+  - <<: *default
+    name: fedora36
+    image: fedora:36
+
+  - <<: *default
+    name: fedora37
+    image: fedora:37
 
 provisioner:
   name: ansible
@@ -55,6 +73,38 @@ provisioner:
     ANSIBLE_FORCE_COLOR: "true"
   options:
     v: true
+  ansible_args:
+    - -v
+    - --tags=always,install,init,config,users,db,ext,backup
+  inventory:
+    group_vars:
+      all:
+        postgresql_debug: true
+      replica:
+        var: value
+    host_vars:
+      claranet_postgresql_debian-10-${scenario:-default}:
+        postgresql_version: 13
+      claranet_postgresql_debian-11-${scenario:-default}:
+        postgresql_version: 14
+      claranet_postgresql_ubuntu-18.04-${scenario:-default}:
+        postgresql_version: 15
+      claranet_postgresql_ubuntu-20.04-${scenario:-default}:
+        postgresql_version: 15
+      claranet_postgresql_ubuntu-22.04-${scenario:-default}:
+        postgresql_version: 15
+      claranet_postgresql_centos-8-${scenario:-default}:
+        postgresql_version: 13
+      claranet_postgresql_stream-8.7-${scenario:-default}:
+        postgresql_version: 13
+      claranet_postgresql_rocky-8-${scenario:-default}:
+        postgresql_version: 13
+      claranet_postgresql_rocky-9-${scenario:-default}:
+        postgresql_version: 13
+      claranet_postgresql_fedora-36-${scenario:-default}:
+        postgresql_version: 13
+      claranet_postgresql_fedora-37-${scenario:-default}:
+        postgresql_version: 13
 
 verifier:
   name: testinfra

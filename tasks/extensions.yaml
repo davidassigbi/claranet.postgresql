@@ -1,0 +1,26 @@
+---
+- name: Ensure PostgreSQL extensions are present.
+  community.postgresql.postgresql_ext:
+    name: "{{ item.name }}"
+    db: "{{ item.db }}"
+    login_host: "{{ item.login_host | d('localhost') }}"
+    login_password: "{{ item.login_password | d(omit) }}"
+    login_user: "{{ item.login_user | d(postgresql_user) }}"
+    login_unix_socket: "{{ item.login_unix_socket | d(postgresql_unix_socket_directories[0]) }}"
+    # login_unix_socket: "/var/run/postgresql/.s.PGSQL.5432"
+    port: "{{ item.port | d(omit) }}"
+    state: "{{ item.state | d('present') }}"
+    schema: "{{ item.schema | d('public') }}"
+    # allow usage of all options
+    ssl_mode: "{{ item.ssl_mode | d(omit) }}"
+    ca_cert: "{{ item.ca_cert | d(omit) }}"
+    session_role: "{{ item.session_role | d(omit) }}"
+    cascade: "{{ item.cascade | d(omit) }}"
+    version: "{{ item.version | d(omit) }}"
+    trust_input: "{{ item.trust_input | d(omit) }}"
+  loop: "{{ postgresql_extensions }}"
+  become: true
+  become_user: "{{ postgresql_user }}"
+  # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true

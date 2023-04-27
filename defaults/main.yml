@@ -1,4 +1,23 @@
 ---
+# Postgresql version
+postgreqsl_version: 14
+postgresql_port: 5432
+postgresql_listen_addresses: 0.0.0.0
+postgresql_shared_preload_libraries:
+  - pg_stat_statements
+
+
+# Postgresql installation related variables
+# Debian only. Used to generate the locales used by PostgreSQL databases.
+postgresql_locales:
+  - 'en_US.UTF-8'
+  - 'fr_FR.UTF-8'
+
+# Redhat only. For more info check: https://www.thegeekdiary.com/how-to-add-locale-on-centos-rhel-8/
+postgresql_locale_packages:
+  - glibc-langpack-en
+  - glibc-langpack-fr
+
 # RHEL/CentOS only. Set a repository to use for PostgreSQL installation.
 postgresql_enablerepo: ""
 
@@ -6,7 +25,7 @@ postgresql_enablerepo: ""
 # `restarted` or `reloaded`
 postgresql_restarted_state: "restarted"
 
-postgresql_python_library: python-psycopg2
+# postgresql_python_library: python-psycopg2
 postgresql_user: postgres
 postgresql_group: postgres
 
@@ -25,6 +44,14 @@ postgresql_global_config_options:
     value: '{{ postgresql_unix_socket_directories | join(",") }}'
   - option: log_directory
     value: 'log'
+  - option: data_directory
+    value: '{{ postgresql_data_dir }}'
+  - option: port
+    value: '{{ postgresql_port }}'
+  - option: listen_addresses
+    value: '{{ postgresql_listen_addresses }}'
+  - option: shared_preload_libraries
+    value: '{{ postgresql_shared_preload_libraries | join(",") }}'
 
 # Host based authentication (hba) entries to be added to the pg_hba.conf. This
 # variable's defaults reflect the defaults that come with a fresh installation.
@@ -34,9 +61,6 @@ postgresql_hba_entries:
   - {type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: "{{ postgresql_auth_method }}"}
   - {type: host, database: all, user: all, address: '::1/128', auth_method: "{{ postgresql_auth_method }}"}
 
-# Debian only. Used to generate the locales used by PostgreSQL databases.
-postgresql_locales:
-  - 'en_US.UTF-8'
 
 # Databases to ensure exist.
 postgresql_databases: []
@@ -67,6 +91,64 @@ postgresql_users: []
 #   login_unix_socket: # defaults to 1st of postgresql_unix_socket_directories
 #   port: # defaults to not set
 #   state: # defaults to 'present'
-
 # Whether to output user data when managing users.
 postgres_users_no_log: true
+
+# Extensions management per database
+postgresql_extensions: []
+
+
+# Replication related variables
+postgresql_replication: true
+postgresql_replication_role: master
+postgresql_replication_user: userrep
+postgresql_replication_password: pwrep
+postgresql_replication_port: 5432
+postgresql_replication_master: 192.168.1.1
+postgresql_replication_slave: "192.168.1.2"
+
+
+# Auto tunning
+postgresql_autotune: true
+
+
+# Backup related variables (using the script automysqlbackup from https://sourceforge.net/projects/automysqlbackup/)
+# Root directory containing the backups
+postgresql_backup_root_dir: /var/backups/postgresql
+postgresql_backup_script_dest: /var/backups/autopostgresqlbackup.sh
+# Databases to backup or all to backup all databases
+postgresql_backup_dbnames: "all"
+# Databases to not backup. You can append more databases here. Be carefull not to remove the original ones in the list otherwise errors might occur during backup execution
+postgresql_backup_dbexclude: ""
+# The name of the cron job created to run the backup job on a recurring basis
+postgresql_backup_cron_job_name: Postgresql - Backup management
+postgresql_backup_schedule:
+  minute: 0
+  hour: 0
+  # month:
+  # weekday:
+  # day:
+# Maximum age in days that backups are kept before deleted
+postgresql_backup_keep_count: 8
+# An email address that will be notified after each backup execution
+postgresql_backup_mail_addr: admin@email.com
+postgreql_backup_create_database: "yes"
+postgresq_backup_doweekly: 6
+postgresql_backup_domonthly: 1
+postgresql_backup_brdaily: 14
+postgresql_backup_brweekly: 5
+postgresql_backup_brmontly: 12
+postgresql_backup_perm: "600"
+
+
+# Proxy variables
+# HTTP and HTTPS proxy to use for general internet access on the MariaDB server
+postgresql_http_general_proxy: ''
+postgresql_https_general_proxy: ''
+# Env var used to provide the proxies to 'internet' tasks
+_postgresql_general_proxy_env: {}
+# HTTP and HTTPS proxy to use for package manager interaction (such as downloading packages, updating cache, etc) on the postgresql server
+postgresql_http_pkg_proxy: ''
+postgresql_https_pkg_proxy: ''
+# Env var used to provide specified proxies to package manager tasks
+_postgresql_pkg_proxy_env: {}

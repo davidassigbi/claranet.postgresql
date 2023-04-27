@@ -1,0 +1,17 @@
+---
+__postgresql_version: "14"
+__postgresql_data_dir: "/var/lib/postgresql/{{ postgresql_version }}/main"
+__postgresql_bin_path: "/usr/lib/postgresql/{{ postgresql_version }}/bin"
+__postgresql_config_path: "/etc/postgresql/{{ postgresql_version }}/main"
+__postgresql_daemon: "postgresql@{{ postgresql_version }}-main"
+__postgresql_packages:
+  - python3-pip
+  - python3-dev
+  - postgresql-{{ postgresql_version }}
+  - cron
+  - libpq-dev
+  - nano
+  - pg-activity
+  # removed as it depends on the latest version of postgresql package, so it entails installing this package also install the latest postgresql server package and because
+  # - postgresql-contrib
+__postgresql_mirror_url: "{{ __postgresql_apt_mirror_url }}"
