@@ -3,9 +3,15 @@
 postgreqsl_version: 14
 postgresql_port: 5432
 postgresql_listen_addresses: 0.0.0.0
+postgresql_max_connections: 100
 postgresql_shared_preload_libraries:
   - pg_stat_statements
 
+# Extra arguments passed to the initdb binary during database initialization
+postgresql_initdb_extra_args: ''
+postgresql_cluster_name: main
+
+postgresql_debug: true
 
 # Postgresql installation related variables
 # Debian only. Used to generate the locales used by PostgreSQL databases.
@@ -39,6 +45,7 @@ postgresql_service_state: started
 postgresql_service_enabled: true
 
 # Global configuration options that will be set in postgresql.conf.
+postgresql_global_config_options_extra: []
 postgresql_global_config_options:
   - option: unix_socket_directories
     value: '{{ postgresql_unix_socket_directories | join(",") }}'
@@ -52,6 +59,9 @@ postgresql_global_config_options:
     value: '{{ postgresql_listen_addresses }}'
   - option: shared_preload_libraries
     value: '{{ postgresql_shared_preload_libraries | join(",") }}'
+  - option: hba_file
+    value: "{{ postgresql_config_path }}/pg_hba.conf"
+
 
 # Host based authentication (hba) entries to be added to the pg_hba.conf. This
 # variable's defaults reflect the defaults that come with a fresh installation.
@@ -110,6 +120,20 @@ postgresql_replication_slave: "192.168.1.2"
 
 # Auto tunning
 postgresql_autotune: true
+postgresql_autotune_config_options: []
+# linux/windows/unix
+postgresql_autotune_os_type: linux
+# 386/x86-64
+postgresql_autotune_arch: x86-64
+# HDD/SSD/SAN
+postgresql_autotune_drive_type: SSD
+# WEB/OLTP/DW/Mixed/Desktop
+postgresql_autotune_env_name: OLTP
+postgresql_autotune_include_badger: false
+postgresql_autotune_cpus: "{{ ansible_processor_nproc | d('') }}"
+postgresql_autotune_total_ram: "{{ ((ansible_memtotal_mb / 1024) | round | int) | d('') }}"
+postgresql_autotune_pg_version: "{{ postgresql_version }}"
+postgresql_autotune_url: https://api.pgconfig.org/v1/tuning/get-config?format=conf&include_pgbadger={{ postgresql_autotune_include_badger }}&log_format=csvlog&max_connections={{ postgresql_max_connections }}&pg_version={{ postgresql_version }}&environment_name={{ postgresql_autotune_env_name }}&total_ram={{ postgresql_autotune_total_ram }}GB&cpus={{ postgresql_autotune_cpus }}&drive_type={{ postgresql_autotune_drive_type }}&arch={{ postgresql_autotune_arch }}&os_type={{ postgresql_autotune_os_type }}
 
 
 # Backup related variables (using the script automysqlbackup from https://sourceforge.net/projects/automysqlbackup/)

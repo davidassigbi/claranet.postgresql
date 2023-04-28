@@ -7,7 +7,7 @@ __postgresql_daemon: postgresql-{{ postgresql_version }}
 __postgresql_packages:
   - python3-pip
   - python3-devel
-  - cronie
+  - cronie # dependency for managing crontab files on redhat
   # - libpq-devel
   - postgresql{{ postgresql_version }}-server
   - postgresql{{ postgresql_version }}-contrib

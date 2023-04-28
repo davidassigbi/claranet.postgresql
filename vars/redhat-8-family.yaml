@@ -19,4 +19,3 @@ __postgresql_unix_socket_directories_mode: '0755'
 __postgresql_mirror_url: "{{ __postgresql_yum_mirror_url }}"
 
 __postgresql_service_path: /usr/lib/systemd/system/postgresql-{{ postgresql_version }}.service
-# postgresql_python_library: python3-psycopg2

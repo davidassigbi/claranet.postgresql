@@ -5,7 +5,6 @@ __postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"
 __postgresql_config_path: "/var/lib/pgsql/data"
 __postgresql_daemon: postgresql-{{ postgresql_version }}
 __postgresql_packages:
-  # needed for installing psycopg2
   - python3-pip
   - python3-devel
   - cronie # dependency for managing crontab files on redhat

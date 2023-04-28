@@ -23,10 +23,19 @@
     state: present
     update_cache: true
   environment: "{{ _postgresql_pkg_proxy_env }}"
+  register: _postgresql_packages_installation_res
 
 - name: Ensure all configured locales are present.
   community.general.locale_gen:
     name: "{{ item }}"
     state: present
   loop: "{{ postgresql_locales }}"
-  register: _postgresql_locale_gen_result
+  register: _postgresql_locale_gen_res
+
+- name: Drop the automatically created cluster after installation
+  ansible.builtin.command: /usr/bin/pg_dropcluster --stop {{ postgresql_version }} main
+  changed_when: true
+  when:
+    - _postgresql_packages_installation_res is changed
+    - postgresql_bin_path ~ '/initdb -D' in _postgresql_packages_installation_res.stdout
+  tags: skip_ansible_lint

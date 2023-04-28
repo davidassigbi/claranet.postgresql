@@ -8,6 +8,13 @@
   ansible.builtin.import_tasks: setup-vars.yaml
   tags: always
 
+- name: Import auto tunning tasks
+  ansible.builtin.import_tasks: autotune.yaml
+  when: postgresql_autotune
+  tags:
+    - auto-tune
+    - autotune
+
 - name: Import installation tasks
   ansible.builtin.import_tasks: install.yaml
   tags: install
@@ -57,10 +64,3 @@
     - ext
     - extension
     - extensions
-
-- name: Import auto tunning tasks
-  ansible.builtin.import_tasks: autotune.yaml
-  when: postgresql_autotune
-  tags:
-    - auto-tune
-    - autotune

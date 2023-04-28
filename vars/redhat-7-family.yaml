@@ -32,5 +32,5 @@ __postgresql_unix_socket_directories_mode: '0755'
 __postgresql_mirror_url: https://download.postgresql.org/pub/repos/yum/reporpms
 _postgresql_repo_rpm_url: "{{ postgresql_mirror_url }}/{{ (ansible_distro == 'fedora') | ternary('F', 'EL') }}-{{ ansible_distribution_major_version }}-x86_64/pgdg-{{ (ansible_distro == 'fedora') | ternary('fedora', 'redhat') }}-repo-latest.noarch.rpm"
 
-__postgresql_service_path: /usr/lib/systemd/system/postgresql-{{ postgresql_version }}.service
+__postgresql_service_path: /usr/lib/systemd/system/{{ postgresql_daemon }}.service
 # postgresql_python_library: python3-psycopg2

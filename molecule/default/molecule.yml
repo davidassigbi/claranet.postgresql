@@ -75,7 +75,7 @@ provisioner:
     v: true
   ansible_args:
     - -v
-    - --tags=always,install,init,config,users,db,ext,backup
+    - --tags=always,install,init,config,users,db,ext,backup,autotune
   inventory:
     group_vars:
       all:

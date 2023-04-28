@@ -1,18 +1,4 @@
 ---
-- name: Update PGDATA env var in the service file on redhat
-  community.general.ini_file:
-    path: '{{ postgresql_service_path }}'
-    section: Service
-    option: Environment
-    value: PGDATA={{ postgresql_data_dir }}
-    state: present
-  notify:
-    - Reload systemd
-    - Restart postgresql
-  when:
-    - postgresql_service_path | length > 0
-    - ansible_os_family | lower == 'redhat'
-
 - name: Configure global settings.
   ansible.builtin.lineinfile:
     dest: "{{ postgresql_config_path }}/postgresql.conf"
@@ -20,7 +6,8 @@
     line: "{{ item.option }} = '{{ item.value }}'"
     state: "{{ item.state | default('present') }}"
     mode: 0644
-  loop: "{{ postgresql_global_config_options }}"
+  loop: "{{ postgresql_autotune_config_options + postgresql_global_config_options + postgresql_global_config_options_extra }}"
+  diff: true
   notify: Restart postgresql
 
 - name: Configure host based authentication (if entries are configured).
@@ -30,6 +17,7 @@
     owner: "{{ postgresql_user }}"
     group: "{{ postgresql_group }}"
     mode: 0600
+  diff: true
   notify: Restart postgresql
 
 - name: Ensure PostgreSQL unix socket dirs exist.
