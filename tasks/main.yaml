@@ -15,7 +15,7 @@
 
 - name: Import auto tunning tasks
   ansible.builtin.import_tasks: autotune.yaml
-  when: postgresql_autotune
+  when: postgresql_autotune | bool
   tags:
     - auto-tune
     - autotune

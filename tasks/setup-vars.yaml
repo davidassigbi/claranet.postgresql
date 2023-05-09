@@ -62,7 +62,7 @@
 - name: Define postgresql_data_dir.
   ansible.builtin.set_fact:
     postgresql_data_dir: "{{ __postgresql_data_dir }}"
-  when: postgresql_data_dir is not defined or postgresql_data_dir | length > 0
+  when: postgresql_data_dir is not defined or postgresql_data_dir | length == 0
 
 - name: Define postgresql_bin_path.
   ansible.builtin.set_fact:
