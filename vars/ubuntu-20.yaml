@@ -7,7 +7,6 @@ __postgresql_daemon: "postgresql@{{ postgresql_version }}-{{ postgresql_cluster_
 __postgresql_packages:
   - python3-pip
   - python3-dev
-  - acl
   - postgresql-{{ postgresql_version }}
   - cron
   - libpq-dev

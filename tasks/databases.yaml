@@ -28,4 +28,5 @@
   loop: "{{ postgresql_databases }}"
   become: true
   become_user: "{{ postgresql_user }}"
-
+  vars:
+    ansible_ssh_pipelining: true
