@@ -58,9 +58,9 @@
     - name: Ensure PostgreSQL database is initialized
       ansible.builtin.command: "{{ postgresql_bin_path }}/pg_ctl initdb -D {{ postgresql_data_dir }} -o '{{ postgresql_initdb_extra_args }}'"
       register: _postgresql_initdb_res
-      environment:
+      # environment:
         # PGDATA: "{{ postgresql_data_dir }}"
-        PGSETUP_INITDB_OPTIONS: "-D {{ postgresql_data_dir }} {{ postgresql_initdb_extra_args }}"
+        # PGSETUP_INITDB_OPTIONS: "-D {{ postgresql_data_dir }} {{ postgresql_initdb_extra_args }}"
         # PGSETUP_INITDB_OPTIONS: "{{ postgresql_initdb_extra_args }}"
       changed_when:
         - '"Success" in _postgresql_initdb_res.stdout'

@@ -18,6 +18,7 @@
   ansible.builtin.uri:
     url: "{{ postgresql_autotune_url }}"
     return_content: true
+  # check cases where pgconfig
   register: _postgresql_autotune_res
 
 - name: Extract individual parameters from autotune response

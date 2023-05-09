@@ -16,10 +16,24 @@
     name: "{{ postgresql_backup_cron_job_name }}"
     state: absent
 
+- name: Stop postgresql service
+  ansible.builtin.systemd:
+    name: "{{ postgresql_daemon }}"
+    state: stopped
+    enabled: false
+
 - name: Import tasks (debian/uninstall.yaml)
   ansible.builtin.import_tasks: debian/uninstall.yaml
   when: ansible_os_family | lower == "debian"
 
 - name: Import tasks (redhat/uninstall.yaml)
-  ansible.builtin.import_tasks: redhat/uninstallinstall.yaml
+  ansible.builtin.import_tasks: redhat/uninstall.yaml
   when: ansible_os_family | lower == "redhat"
+
+- name: Delete data dir
+  ansible.builtin.file:
+    path: "{{ postgresql_data_dir }}"
+    state: absent
+
+- name: End play after uninstallation
+  ansible.builtin.meta: end_play
