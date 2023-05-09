@@ -5,7 +5,7 @@
 
 - name: Restart postgresql
   ansible.builtin.service:
-    name: "{{ postgresql_daemon }}"
+    name: "{{ _postgresql_daemon }}"
     state: "{{ postgresql_restarted_state }}"
     enabled: "{{ postgresql_service_enabled }}"
     sleep: 5

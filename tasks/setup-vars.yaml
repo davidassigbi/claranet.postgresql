@@ -1,6 +1,4 @@
 ---
-# # Variable configuration.
-
 - name: Gather OS specific variables
   ansible.builtin.include_vars: "{{ loop_vars }}"
   loop: "{{ query('ansible.builtin.first_found', params) }}"
@@ -29,11 +27,6 @@
   ansible.builtin.set_fact:
     postgresql_packages: "{{ __postgresql_packages }}"
   when: postgresql_packages is not defined
-
-- name: Define postgresql_daemon.
-  ansible.builtin.set_fact:
-    postgresql_daemon: "{{ __postgresql_daemon }}"
-  when: postgresql_daemon is not defined
 
 - name: Define postgresql_bin_path.
   ansible.builtin.set_fact:

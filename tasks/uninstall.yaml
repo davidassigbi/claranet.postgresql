@@ -18,7 +18,7 @@
 
 - name: Stop postgresql service
   ansible.builtin.systemd:
-    name: "{{ postgresql_daemon }}"
+    name: "{{ _postgresql_daemon }}"
     state: stopped
     enabled: false
 

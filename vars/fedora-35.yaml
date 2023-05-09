@@ -3,7 +3,7 @@ __postgresql_version: "13"
 _postgresql_data_dir: "{{ postgresql_data_dir | d('/var/lib/pgsql/data', true) }}"
 __postgresql_bin_path: "/usr/bin"
 __postgresql_config_path: "/var/lib/pgsql/data"
-__postgresql_daemon: postgresql
+_postgresql_daemon: "{{ postgresql_daemon | d('postgresql', true) }}"
 __postgresql_packages:
   - postgresql{{ postgresql_version }}-server
   - postgresql-contrib
