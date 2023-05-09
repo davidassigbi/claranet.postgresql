@@ -1,0 +1,12 @@
+---
+- name: Drop cluster
+  ansible.builtin.command: /usr/bin/pg_dropcluster {{ postgresql_version }} main
+  register: _postgresql_drop_cluster_res
+  changed_when: _postgresql_drop_cluster_res.rc == 0
+  ignore_errors: true
+
+- name: Purge all installed packages
+  ansible.builtin.apt:
+    name: "{{ postgresql_packages }}"
+    state: absent
+    purge: true

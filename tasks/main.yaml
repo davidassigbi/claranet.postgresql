@@ -8,6 +8,11 @@
   ansible.builtin.import_tasks: setup-vars.yaml
   tags: always
 
+- name: Import uninstallation tasks
+  ansible.builtin.import_tasks: uninstall.yaml
+  tags: uninstall
+  when: postgresql_uninstall_1 | bool and postgresql_uninstall_2 | bool
+
 - name: Import auto tunning tasks
   ansible.builtin.import_tasks: autotune.yaml
   when: postgresql_autotune

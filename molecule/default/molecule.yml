@@ -26,21 +26,21 @@ platforms:
     command: "/lib/systemd/systemd"
     cgroupns_mode: host
 
-  - <<: *default
-    name: debian11
-    image: debian:11
+  # - <<: *default
+  #   name: debian11
+  #   image: debian:11
 
   - <<: *default
     name: ubuntu18
     image: ubuntu:18.04
 
-  - <<: *default
-    name: ubuntu20
-    image: ubuntu:20.04
+  # - <<: *default
+  #   name: ubuntu20
+  #   image: ubuntu:20.04
 
-  - <<: *default
-    name: ubuntu22
-    image: ubuntu:22.04
+  # - <<: *default
+  #   name: ubuntu22
+  #   image: ubuntu:22.04
 
   # - <<: *default
   #   name: centos8
@@ -55,17 +55,17 @@ platforms:
     name: rocky8
     image: rockylinux:8.7
 
-  - <<: *default
-    name: rocky9
-    image: rockylinux:9.1
+  # - <<: *default
+  #   name: rocky9
+  #   image: rockylinux:9.1
 
   - <<: *default
     name: fedora36
     image: fedora:36
 
-  - <<: *default
-    name: fedora37
-    image: fedora:37
+  # - <<: *default
+  #   name: fedora37
+  #   image: fedora:37
 
 provisioner:
   name: ansible
