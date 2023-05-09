@@ -56,7 +56,7 @@ postgresql_global_config_options:
   - option: port
     value: '{{ postgresql_port }}'
   - option: listen_addresses
-    value: '{{ postgresql_listen_addresses }}'
+    value: '{{ postgresql_listen_addresses | join(",") }}'
   - option: shared_preload_libraries
     value: '{{ postgresql_shared_preload_libraries | join(",") }}'
   - option: hba_file
