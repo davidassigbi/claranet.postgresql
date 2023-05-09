@@ -8,7 +8,7 @@
 
 - name: Ensure PostgreSQL data directory exists.
   ansible.builtin.file:
-    path: "{{ postgresql_data_dir }}"
+    path: "{{ _postgresql_data_dir }}"
     owner: "{{ postgresql_user }}"
     group: "{{ postgresql_group }}"
     state: directory
@@ -16,7 +16,7 @@
 
 - name: Check if PostgreSQL database is initialized.
   ansible.builtin.stat:
-    path: "{{ postgresql_data_dir }}/PG_VERSION"
+    path: "{{ _postgresql_data_dir }}/PG_VERSION"
   register: _postgresql_pgdata_dir_version_res
 
 - name: Initialize new cluster on debian os family
@@ -25,9 +25,9 @@
     - not _postgresql_pgdata_dir_version_res.stat.exists
   block:
     - name: Ensure PostgreSQL database is initialized.
-      # ansible.builtin.command: "{{ postgresql_bin_path }}/initdb -D {{ postgresql_data_dir }}"
+      # ansible.builtin.command: "{{ postgresql_bin_path }}/initdb -D {{ _postgresql_data_dir }}"
       ansible.builtin.command: >
-        /usr/bin/pg_createcluster {{ postgresql_version }} main -d {{ postgresql_data_dir }} -- {{ postgresql_initdb_extra_args }}
+        /usr/bin/pg_createcluster {{ postgresql_version }} main -d {{ _postgresql_data_dir }} -- {{ postgresql_initdb_extra_args }}
       register: _postgresql_initdb_res
       changed_when:
         - postgresql_bin_path ~ '/initdb' in _postgresql_initdb_res.stdout
@@ -45,7 +45,7 @@
         path: '{{ postgresql_service_path }}'
         section: Service
         option: Environment
-        value: PGDATA={{ postgresql_data_dir }}
+        value: PGDATA={{ _postgresql_data_dir }}
         state: present
       notify:
         - Reload systemd
@@ -56,11 +56,11 @@
 
       # ansible.builtin.command: "{{ postgresql_bin_path }}/postgresql-{{ postgresql_version }}-setup initdb {{ postgresql_daemon }}"
     - name: Ensure PostgreSQL database is initialized
-      ansible.builtin.command: "{{ postgresql_bin_path }}/pg_ctl initdb -D {{ postgresql_data_dir }} -o '{{ postgresql_initdb_extra_args }}'"
+      ansible.builtin.command: "{{ postgresql_bin_path }}/pg_ctl initdb -D {{ _postgresql_data_dir }} -o '{{ postgresql_initdb_extra_args }}'"
       register: _postgresql_initdb_res
       # environment:
-        # PGDATA: "{{ postgresql_data_dir }}"
-        # PGSETUP_INITDB_OPTIONS: "-D {{ postgresql_data_dir }} {{ postgresql_initdb_extra_args }}"
+        # PGDATA: "{{ _postgresql_data_dir }}"
+        # PGSETUP_INITDB_OPTIONS: "-D {{ _postgresql_data_dir }} {{ postgresql_initdb_extra_args }}"
         # PGSETUP_INITDB_OPTIONS: "{{ postgresql_initdb_extra_args }}"
       changed_when:
         - '"Success" in _postgresql_initdb_res.stdout'
