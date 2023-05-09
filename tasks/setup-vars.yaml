@@ -63,6 +63,10 @@
   ansible.builtin.debug:
     var: postgresql_data_dir
 
+- name: Show postgresql data dir length
+  ansible.builtin.debug:
+    msg: "{{ postgresql_data_dir | length }}"
+
 - name: Define postgresql_data_dir.
   ansible.builtin.set_fact:
     postgresql_data_dir: "{{ __postgresql_data_dir }}"
