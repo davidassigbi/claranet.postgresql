@@ -52,7 +52,7 @@ postgresql_global_config_options:
   - option: log_directory
     value: 'log'
   - option: data_directory
-    value: '{{ postgresql_data_dir }}'
+    value: '{{ _postgresql_data_dir }}'
   - option: port
     value: '{{ postgresql_port }}'
   - option: listen_addresses
