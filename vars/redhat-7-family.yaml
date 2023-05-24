@@ -1,19 +1,6 @@
-# ---
-# __postgresql_version: "14"
-# __postgresql_data_dir: "/var/lib/pgsql/data"
-# __postgresql_bin_path: "/usr/bin"
-# __postgresql_config_path: "/var/lib/pgsql/data"
-# __postgresql_daemon: postgresql
-# __postgresql_packages:
-#   # - postgresql
-#   - postgresql{{ postgresql_version }}-server
-#   - postgresql-contrib
-#   - postgresql-libs
-
-
 ---
-__postgresql_version: "14"
-__postgresql_data_dir: "/var/lib/pgsql/data"
+postgresql_version: 14
+_postgresql_data_dir: "{{ postgresql_data_dir | d('/var/lib/pgsql/data', true) }}"
 __postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"
 __postgresql_config_path: "/var/lib/pgsql/data"
 _postgresql_daemon: "{{ postgresql_daemon | d('postgresql-' ~ postgresql_version, true) }}"

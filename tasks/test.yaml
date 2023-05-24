@@ -1,4 +1,11 @@
 ---
+# - name: debug
+#   ansible.builtin.debug:
+#     var: postgresql_autotune_url
+
+# - name: debug
+#   ansible.builtin.debug:
+#     var: postgresql_pg_basebackup_cmd
 
 # - name: End play
 #   ansible.builtin.meta: end_play

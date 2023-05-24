@@ -1,0 +1,120 @@
+---
+- name: Check replication status on replica (ansible postgresql query module)
+  community.postgresql.postgresql_query:
+    query: select * from pg_stat_wal_receiver
+    login_unix_socket: "{{ item.login_unix_socket | default(postgresql_unix_socket_directories[0]) }}"
+    port: "{{ postresql_port | default(omit) }}"
+  register: _postgresql_replication_check
+  become: true
+  become_user: "{{ postgresql_user }}"
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: Stat recovery.conf on replica (pg < 12)
+  ansible.builtin.stat:
+    path: "{{ _postgresql_data_dir }}/recovery.conf"
+  register: _postgresql_recovery_conf
+  when: postgresql_version | float < 12
+
+- name: Debug replication status checks
+  ansible.builtin.debug:
+    var: item
+  loop:
+    - _postgresql_replication_check.rowcount: "{{ _postgresql_replication_check.rowcount }}"
+    - _postgresql_replication_check.query_result[0]['status']: "{{ _postgresql_replication_check.query_result[0]['status'] | d('UNDEFINED') }}"
+    - _postgresql_recovery_conf: "{{ _postgresql_recovery_conf }}"
+
+- name: Set _postgresql_replication_is_running
+  ansible.builtin.set_fact:
+    _postgresql_replication_is_running: "{{
+        _postgresql_replication_check.rowcount == 1 and
+        _postgresql_replication_check.query_result[0]['status'] == 'streaming' and
+        (postgresql_version | float >= 12 or _postgresql_recovery_conf.stat.exists)
+      }}" # Either pg version is >=12 or recovery.conf does exists meaning that when pg version is less
+
+
+- name: Configure replication
+  when: not _postgresql_replication_is_running
+  block:
+    - name: Stop postgresql daemon on the replica
+      ansible.builtin.service:
+        name: "{{ _postgresql_daemon }}"
+        state: stopped
+
+    - name: Empty replica data dir
+      ansible.builtin.file:
+        dest: "{{ _postgresql_data_dir }}"
+        state: absent
+
+    - name: "Re-create replica data dir {{ _postgresql_data_dir }}"
+      ansible.builtin.file:
+        path: "{{ _postgresql_data_dir }}"
+        state: directory
+        owner: "{{ postgresql_user }}"
+        group: "{{ postgresql_group }}"
+        mode: "700"
+
+    - name: "Deploy .pgpass file for {{ postgresql_user }}"
+      ansible.builtin.template:
+        src: pgpass.j2
+        dest: "~{{ postgresql_user }}/.pgpass"
+        owner: "{{ postgresql_user }}"
+        group: "{{ postgresql_user }}"
+        mode: 0400
+
+    - name: Copy data from primary
+      ansible.builtin.command: "{{ postgresql_pg_basebackup_cmd }}"
+      changed_when: false
+      become: true
+      become_user: "{{ postgresql_user }}"
+      vars:
+        ansible_ssh_pipelining: true
+
+    - name: Configure primary_slot_name
+      ansible.builtin.lineinfile:
+        dest: "{{ postgresql_config_path }}/postgresql.conf"
+        regexp: "^#?primary_slot_name.+$"
+        line: "primary_slot_name = '{{ postgresql_replication_slot }}'"
+        state: present
+        mode: 0644
+      when: postgresql_replication_slot | length > 0
+
+    # Doesn't pg_basebackup create recovery.conf on pg < 12 ?
+    - name: Configure replication recovery.conf if not exists on pg < 12
+      ansible.builtin.template:
+        src: recovery.conf.j2
+        dest: "{{ _postgresql_data_dir }}/recovery.conf"
+        owner: "{{ postgresql_user }}"
+        group: "{{ postgresql_group }}"
+        mode: 0640
+      diff: true
+      when: postgresql_version | float < 12
+
+    # Doesn't pg_basebackup create standby.signal on pg >= 12 ?
+    - name: "Create standby.signal for replica on pg >= 12"
+      ansible.builtin.file:
+        path: "{{ _postgresql_data_dir }}/standby.signal"
+        state: touch
+        owner: "{{ postgresql_user }}"
+        group: "{{ postgresql_group }}"
+        modification_time: preserve
+        access_time: preserve
+        mode: 0640
+      when: postgresql_version | float >= 12
+
+    - name: Configure replication settings on pg >= 12
+      ansible.builtin.lineinfile:
+        dest: "{{ postgresql_config_path }}/postgresql.conf"
+        regexp: "^#?{{ item.option }}.+$"
+        line: "{{ item.option }} = '{{ item.value }}'"
+        state: "{{ item.state | default('present') }}"
+        mode: 0644
+      when: postgresql_version | float >= 12
+      loop:
+        - option: promote_trigger_file
+          value: "{{ _postgresql_data_dir }}/failover"
+
+    - name: Start postgresql server
+      ansible.builtin.service:
+        name: "{{ _postgresql_daemon }}"
+        state: started

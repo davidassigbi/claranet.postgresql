@@ -1,11 +1,11 @@
 ---
-- name: Run test tasks
-  ansible.builtin.import_tasks: test.yaml
-  tags: always
-
 # Variable configuration.
 - name: Setup variables
   ansible.builtin.import_tasks: setup-vars.yaml
+  tags: always
+
+- name: Run test tasks
+  ansible.builtin.import_tasks: test.yaml
   tags: always
 
 - name: Import uninstallation tasks
@@ -38,9 +38,20 @@
     - configure
     - configuration
 
-- name: Import replication tasks
-  ansible.builtin.import_tasks: replication.yaml
-  when: postgresql_replication
+- name: Import primary replication tasks
+  ansible.builtin.import_tasks: replication-primary.yaml
+  when: 
+    - postgresql_replication
+    - postgresql_replication_role == "primary"
+  tags:
+    - repli
+    - replication
+
+- name: Import replica replication tasks
+  ansible.builtin.import_tasks: replication-replica.yaml
+  when: 
+    - postgresql_replication
+    - postgresql_replication_role == "replica"
   tags:
     - repli
     - replication
@@ -52,12 +63,14 @@
 # Configure PostgreSQL.
 - name: Import user management tasks
   ansible.builtin.import_tasks: users.yaml
+  when: not postgresql_replication or postgresql_replication_role == "primary"
   tags:
     - user
     - users
 
 - name: Import databases tasks
   ansible.builtin.import_tasks: databases.yaml
+  when: not postgresql_replication or postgresql_replication_role == "primary"
   tags:
     - db
     - database
@@ -65,6 +78,7 @@
 
 - name: Import extensions tasks
   ansible.builtin.import_tasks: extensions.yaml
+  when: not postgresql_replication or postgresql_replication_role == "primary"
   tags:
     - ext
     - extension

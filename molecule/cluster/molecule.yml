@@ -1,0 +1,79 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+platforms:
+  # On "${name:-${image:-debian}", the last brace does not miss, it works like that...
+  # The env var should be used when the image variable refers to a full registry path like registry.access.redhat.com/ubi8/ubi
+  - &cluster_node
+    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
+    image: ${image:-debian}:${tag:-latest}
+    privileged: true
+    tty: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    stop_signal: "SIGRTMIN+3"
+    capabilities:
+      - SYS_ADMIN
+      - SYS_TIME
+      - LINUX_IMMUTABLE
+    command: "/lib/systemd/systemd"
+    cgroupns_mode: host
+    networks:
+      - name: ansible-role-postgresql-network-${name:-${image:-debian}-${tag:-latest}
+
+  - &cluster_node_replica
+    <<: *cluster_node
+    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2
+    groups:
+      - replica
+
+  - <<: *cluster_node_replica
+    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
+
+
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_FORCE_COLOR: "true"
+  options:
+    v: true
+  ansible_args:
+    - -v
+    - --tags=always,install,init,config,replication
+  inventory:
+    group_vars:
+      all:
+        postgresql_debug: true
+        postgresql_replication_primary_dns: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
+        postgresql_replication_primary_port: 5432
+        postgresql_replication_replica_dns:
+          - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2
+          - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
+      replica:
+        postgresql_replication_role: replica
+    host_vars:
+      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1:
+        postgresql_replication_role: primary
+        postgresql_replication_physical_slots:
+          - replica1_slot
+          - replica2_slot
+      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2:
+        postgresql_replication_slot: replica1_slot
+      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3:
+        postgresql_replication_slot: replica2_slot
+
+verifier:
+  name: testinfra
+  options:
+    verbose: true
+    s: true
+
+lint: |
+  set -e
+  yamllint .
+  ansible-lint

@@ -1,5 +1,5 @@
 ---
-__postgresql_version: "14"
+postgresql_version: 14
 _postgresql_data_dir: "{{ postgresql_data_dir | d('/var/lib/pgsql/data', true) }}"
 __postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"
 __postgresql_config_path: "/var/lib/pgsql/data"

@@ -18,10 +18,10 @@
   loop_control:
     loop_var: loop_vars
 
-- name: Define postgresql_version.
-  ansible.builtin.set_fact:
-    postgresql_version: "{{ __postgresql_version }}"
-  when: postgresql_version is not defined
+# - name: Define postgresql_version.
+#   ansible.builtin.set_fact:
+#     postgresql_version: "{{ __postgresql_version }}"
+#   when: postgresql_version is not defined
 
 - name: Define postgresql_packages.
   ansible.builtin.set_fact:
@@ -57,7 +57,7 @@
 
 - name: Define postgresql_effective_log_dir, if postgresql_log_dir is relative
   ansible.builtin.set_fact:
-    postgresql_effective_log_dir: '{{ postgresql_data_dir }}/{{ postgresql_log_dir }}'
+    postgresql_effective_log_dir: '{{ _postgresql_data_dir }}/{{ postgresql_log_dir }}'
   when: postgresql_log_dir is not match("/")
 
 - name: Define postgresql repository mirror URL
@@ -78,3 +78,13 @@
     _postgresql_pkg_proxy_env:
       http_proxy: "{{ postgresql_http_pkg_proxy | d(omit, true) }}"
       https_proxy: "{{ postgresql_https_pkg_proxy | d(omit, true) }}"
+
+- name: Add relication hba rules
+  ansible.builtin.set_fact:
+    _postgresql_replication_hba_entries: "{{ _postgresql_replication_hba_entries | d([]) +
+      [{'contype': 'host', 'databases': 'replication', 'users': postgresql_replication_user, 'address': item, 'method': postgresql_replication_auth_method}]
+      }}"
+  loop: "{{ postgresql_replication_replica_addresses }}"
+  when:
+    - postgresql_replication
+    - postgresql_replication_hba_entries | d([], true) | length == 0

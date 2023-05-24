@@ -32,7 +32,7 @@
 
 - name: Delete data dir
   ansible.builtin.file:
-    path: "{{ postgresql_data_dir }}"
+    path: "{{ _postgresql_data_dir }}"
     state: absent
 
 - name: End play after uninstallation

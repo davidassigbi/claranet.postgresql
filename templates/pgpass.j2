@@ -1,2 +1,2 @@
-# password file for replication sync
-{{ postgresql_replication_master }}:{{ postgresql_replication_port }}:*:{{ postgresql_replication_user }}:{{ postgresql_replication_password }}
+# password file for replication user
+{{ postgresql_replication_primary_address }}:{{ postgresql_replication_primary_port }}:replication:{{ postgresql_replication_user }}:{{ postgresql_replication_password }}

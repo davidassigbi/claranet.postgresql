@@ -54,7 +54,7 @@
         - postgresql_service_path | length > 0
       tags: skip_ansible_lint
 
-      # ansible.builtin.command: "{{ postgresql_bin_path }}/postgresql-{{ postgresql_version }}-setup initdb {{ postgresql_daemon }}"
+      # ansible.builtin.command: "{{ postgresql_bin_path }}/postgresql-{{ postgresql_version }}-setup initdb {{ _postgresql_daemon }}"
     - name: Ensure PostgreSQL database is initialized
       ansible.builtin.command: "{{ postgresql_bin_path }}/pg_ctl initdb -D {{ _postgresql_data_dir }} -o '{{ postgresql_initdb_extra_args }}'"
       register: _postgresql_initdb_res

@@ -1,0 +1,32 @@
+---
+
+- name: Ensure postgresql daemon is started on the primary node
+  ansible.builtin.service:
+    name: "{{ _postgresql_daemon }}"
+    state: started
+
+- name: Ensure replication user is present
+  community.postgresql.postgresql_user:
+    name: "{{ postgresql_replication_user }}"
+    password: "{{ postgresql_replication_password }}"
+    encrypted: true
+    expires: infinity
+    role_attr_flags: REPLICATION
+    state: present
+  # no_log: true
+  become: true
+  become_user: "{{ postgresql_user }}"
+  # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: Create the replication slot (with ansible module)
+  community.postgresql.postgresql_slot:
+    name: "{{ item }}"
+    slot_type: physical
+    state: present
+  become: true
+  become_user: "{{ postgresql_user }}"
+  vars:
+    ansible_ssh_pipelining: true
+  loop: "{{ postgresql_replication_physical_slots }}"
