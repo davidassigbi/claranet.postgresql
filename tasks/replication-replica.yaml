@@ -1,5 +1,5 @@
 ---
-- name: Check replication status on replica (ansible postgresql query module)
+- name: Check replication status on replica
   community.postgresql.postgresql_query:
     query: select * from pg_stat_wal_receiver
     login_unix_socket: "{{ item.login_unix_socket | default(postgresql_unix_socket_directories[0]) }}"
@@ -24,14 +24,13 @@
     - _postgresql_replication_check.query_result[0]['status']: "{{ _postgresql_replication_check.query_result[0]['status'] | d('UNDEFINED') }}"
     - _postgresql_recovery_conf: "{{ _postgresql_recovery_conf }}"
 
-- name: Set _postgresql_replication_is_running
+- name: Set fact _postgresql_replication_is_running
   ansible.builtin.set_fact:
     _postgresql_replication_is_running: "{{
         _postgresql_replication_check.rowcount == 1 and
         _postgresql_replication_check.query_result[0]['status'] == 'streaming' and
         (postgresql_version | float >= 12 or _postgresql_recovery_conf.stat.exists)
       }}" # Either pg version is >=12 or recovery.conf does exists meaning that when pg version is less
-
 
 - name: Configure replication
   when: not _postgresql_replication_is_running
@@ -60,7 +59,21 @@
         dest: "~{{ postgresql_user }}/.pgpass"
         owner: "{{ postgresql_user }}"
         group: "{{ postgresql_user }}"
-        mode: 0400
+        mode: "400"
+
+    - name: Ensure physical replication slot exists on the primary
+      community.postgresql.postgresql_slot:
+        name: "{{ postgresql_replication_slot }}"
+        slot_type: physical
+        state: present
+        port: "{{ postgresql_replication_primary_port }}"
+        login_unix_socket: "{{ postgresql_unix_socket_directories[0] }}"
+      delegate_to: "{{ postgresql_replication_primary_inventory_name }}"
+      become: true
+      become_user: "{{ postgresql_user }}"
+      when: postgresql_replication_create_slot and postgresql_replication_slot | length > 0
+      vars:
+        ansible_ssh_pipelining: true
 
     - name: Copy data from primary
       ansible.builtin.command: "{{ postgresql_pg_basebackup_cmd }}"
@@ -70,13 +83,13 @@
       vars:
         ansible_ssh_pipelining: true
 
-    - name: Configure primary_slot_name
+    - name: Configure primary_slot_name in postgresql.conf on the replica
       ansible.builtin.lineinfile:
         dest: "{{ postgresql_config_path }}/postgresql.conf"
         regexp: "^#?primary_slot_name.+$"
         line: "primary_slot_name = '{{ postgresql_replication_slot }}'"
         state: present
-        mode: 0644
+        mode: "644"
       when: postgresql_replication_slot | length > 0
 
     # Doesn't pg_basebackup create recovery.conf on pg < 12 ?
@@ -86,7 +99,7 @@
         dest: "{{ _postgresql_data_dir }}/recovery.conf"
         owner: "{{ postgresql_user }}"
         group: "{{ postgresql_group }}"
-        mode: 0640
+        mode: "640"
       diff: true
       when: postgresql_version | float < 12
 
@@ -99,7 +112,7 @@
         group: "{{ postgresql_group }}"
         modification_time: preserve
         access_time: preserve
-        mode: 0640
+        mode: "640"
       when: postgresql_version | float >= 12
 
     - name: Configure replication settings on pg >= 12
@@ -108,7 +121,7 @@
         regexp: "^#?{{ item.option }}.+$"
         line: "{{ item.option }} = '{{ item.value }}'"
         state: "{{ item.state | default('present') }}"
-        mode: 0644
+        mode: "644"
       when: postgresql_version | float >= 12
       loop:
         - option: promote_trigger_file

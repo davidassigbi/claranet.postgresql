@@ -4,6 +4,6 @@
 #
 # See: https://www.postgresql.org/docs/current/static/auth-pg-hba-conf.html
 
-{% for client in postgresql_hba_entries %}
-{{ client.contype }}\t{{ client.databases }}\t{{ client.users }}\t{{ client.address|default('') }}{{ client.ip_address|default('') }}{{ client.ip_mask|default('') }} {{ client.method }}\t{{ client.auth_options|default('') }}
+{% for client in (postgresql_hba_entries + postgresql_hba_extra_entries + _postgresql_replication_hba_entries) %}
+{{ client.contype ~ '\t' }}{{ client.databases ~ '\t' }}{{ client.users ~ '\t' }}{{ client.address | default('') }} {{ client.ip_address|default('') }} {{ client.ip_mask|default('') }} {{ client.method ~ '\t' }}{{ client.auth_options|default('') }}
 {% endfor %}

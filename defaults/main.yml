@@ -71,7 +71,7 @@ postgresql_hba_entries:
 #  - {contype: local, databases: all, users: all, method: peer}
   - {contype: host, databases: all, users: all, address: '127.0.0.1/32', method: "{{ postgresql_auth_method }}"}
   - {contype: host, databases: all, users: all, address: '::1/128', method: "{{ postgresql_auth_method }}"}
-
+postgresql_hba_extra_entries: []
 
 # Databases to ensure exist.
 postgresql_databases: []
@@ -109,32 +109,49 @@ postgres_users_no_log: true
 postgresql_extensions: []
 
 
+# Replication slots
+# physical slots to create on the primary server, ideally one for each replica
+postgresql_replication_slots: []
+  # - slot_name: slot1
+  #   slot_type: logical
+  #   output_plugin: custom_decoder_one
+  #   state: absent
+  #   db: db1
+  # - slot_name: replica1_slot
+  #   slot_type: physical
+  #   state: present
+
+
 # Replication related variables
 postgresql_replication: true
 postgresql_replication_role: primary # primary/replica
 postgresql_replication_user: replication_user
 postgresql_replication_password: password
+# Address/DNS name of the primary server used in the pgbasebackup
+# command and also in the pgpass file deployed on the replica node
 postgresql_replication_primary_address: ""
+# Port of the Postgresql primary server
 postgresql_replication_primary_port: 5432
+# Replication slot to use on the replica
 postgersql_replication_slot: ""
-# physical slots to create on the primary server, ideally one for each replica
-postgresql_replication_physical_slots: []
-# ip addresses/dns names used to generate hba rules to allow connection from replica hosts in the pg_hba file
+# Ensure the physical replication slot exists on the primary
+postgresql_replication_create_slot: true
+postgresql_replication_primary_inventory_name: ""
+# ip addresses/dns names used to generate replication hba rules
 postgresql_replication_replica_addresses: []
-# hba rules that overrite automatically generated one from the upper variable
-# The rules in this variable will be added to the pg_hba file
+# User provided replication specific hba rules
 postgresql_replication_hba_entries: []
-# Authentication method specific to replica hosts
-postgresql_replication_auth_method: "{{ postgresql_auth_method }}"
+# Private replication specific HBA entries
 _postgresql_replication_hba_entries: "{{ postgresql_replication_hba_entries }}"
   # - contype: host
   #   databases: replication
   #   users: "{{ postgresql_replication_user }}"
   #   address: "{{ postgresql_replication_replica_address }}"
   #   method: "{{ postgresql_replication_auth_method }}"
-postgresql_pg_basebackup_checkpoint: fast
-postgresql_pg_basebackup_walmethod: stream
-postgresql_pg_basebackup_createslot: false
+# Authentication method specific for the replica hosts
+postgresql_replication_auth_method: "{{ postgresql_auth_method }}"
+postgresql_pg_basebackup_checkpoint: fast   # spread
+postgresql_pg_basebackup_walmethod: stream  # none/stream/fetch
 postgresql_pg_basebackup_args: ""
 postgresql_pg_basebackup_cmd: >
   {{ postgresql_bin_path }}/pg_basebackup
@@ -144,10 +161,11 @@ postgresql_pg_basebackup_cmd: >
   --username {{ postgresql_replication_user }}
   --pgdata {{ _postgresql_data_dir }}
   --checkpoint {{ postgresql_pg_basebackup_checkpoint }}
-  {{ postgresql_pg_basebackup_createslot | ternary('--create-slot', '') }}
   {{ (postgresql_replication_slot | length > 0) | ternary('--slot ' ~ postgresql_replication_slot, '') }}
   --wal-method {{ postgresql_pg_basebackup_walmethod }}
   --write-recovery-conf
+  --verbose
+  --progress
   {{ postgresql_pg_basebackup_args }}
 
 
@@ -200,8 +218,8 @@ postgresql_backup_schedule:
 postgresql_backup_keep_count: 8
 # An email address that will be notified after each backup execution
 postgresql_backup_mail_addr: admin@email.com
-postgreql_backup_create_database: "yes"
-postgresq_backup_doweekly: 6
+postgresql_backup_create_database: "yes"
+postgresql_backup_doweekly: 6
 postgresql_backup_domonthly: 1
 postgresql_backup_brdaily: 14
 postgresql_backup_brweekly: 5

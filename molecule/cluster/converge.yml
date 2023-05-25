@@ -51,8 +51,8 @@
 
         - name: Resolve dynamic dns to ip in order to put them in pg_hba
           ansible.builtin.set_fact:
-            # postgresql_replication_replica_addresses: "{{ _dig_short.stdout_lines | product(['32']) | mapt('join', '/')}}"
-            postgresql_replication_replica_addresses: "{{ _dig_short.stdout_lines }}"
+            postgresql_replication_replica_addresses: "{{ _dig_short.stdout_lines | product(['32']) | map('join', '/') }}"
+            # postgresql_replication_replica_addresses: "{{ _dig_short.stdout_lines }}"
 
         - name: Dig short
           ansible.builtin.command:

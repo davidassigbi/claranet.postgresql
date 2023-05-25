@@ -10,49 +10,22 @@
   # diff: true
   notify: Restart postgresql
 
-# - name: Configure host based authentication (if entries are configured).
-#   ansible.builtin.template:
-#     src: "pg_hba.conf.j2"
-#     dest: "{{ postgresql_config_path }}/pg_hba.conf"
-#     owner: "{{ postgresql_user }}"
-#     group: "{{ postgresql_group }}"
-#     mode: 0600
-#   # diff: true
-#   notify: Restart postgresql
-# Didnt use the postgresql_hba module because it will allways report
-
-- name: Ensure pg_hba file exists
-  ansible.builtin.file:
-    path: "{{ postgresql_config_path }}/pg_hba.conf"
+- name: Configure host based authentication (if entries are configured).
+  ansible.builtin.template:
+    src: "pg_hba.conf.j2"
+    dest: "{{ postgresql_config_path }}/pg_hba.conf"
     owner: "{{ postgresql_user }}"
     group: "{{ postgresql_group }}"
-    mode: 0600
-    state: touch
-    modification_time: preserve
-    access_time: preserve
-
-# - name: Configure host based authentication (if entries are configured).
-#   community.postgresql.postgresql_pg_hba:
-#     dest: "{{ postgresql_config_path }}/pg_hba.conf"
-#     contype: "{{ item.contype | d(item.type) | d(omit) }}"
-#     databases: "{{ item.databases | d(omit) }}"
-#     users: "{{ item.users | d(item.user) | d(omit) }}"
-#     method: "{{ item.method | d(item.auth_method) | d(omit) }}"
-#     address: "{{ item.address | d(omit) }}"
-#     comment: "{{ item.comment | d(omit) }}"
-#     # backup_file: "{{ postgresql_config_path }}/pg_hba.conf.backup"
-#     # backup: true
-#   loop: "{{ postgresql_hba_entries + _postgresql_replication_hba_entries }}"
-#   notify: Restart postgresql
-
-- name: Configure host based authentication (if entries are configured).
-  community.postgresql.postgresql_pg_hba:
-    dest: "{{ postgresql_config_path }}/pg_hba.conf"
-    backup_file: "{{ postgresql_config_path }}/pg_hba.conf.backup"
     backup: true
-    # overwrite: true
-    rules: "{{ postgresql_hba_entries + _postgresql_replication_hba_entries }}"
+    mode: "600"
   notify: Restart postgresql
+# Not using the postgresql_hba module because it entailed having
+# a task to ensure the file is empty of default rules
+# a task to add the rules.
+# The first task should only be executed once otherwise the rules
+# task will also always report as changed which is not true.
+# Basically it added more complications whilst the template module
+# works just fine.
 
 - name: Ensure PostgreSQL unix socket dirs exist.
   ansible.builtin.file:

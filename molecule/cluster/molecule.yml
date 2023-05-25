@@ -56,16 +56,21 @@ provisioner:
           - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
       replica:
         postgresql_replication_role: replica
+        postgresql_replication_create_slot: true
+        postgresql_replication_primary_inventory_name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
     host_vars:
       claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1:
         postgresql_replication_role: primary
-        postgresql_replication_physical_slots:
-          - replica1_slot
-          - replica2_slot
+        postgresql_replication_slots:
+          - slot_name: replica1_slot
+            slot_type: physical
+            state: absent
+          - slot_name: replica2_slot
+            slot_type: physical
       claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2:
-        postgresql_replication_slot: replica1_slot
+        postgresql_replication_slot: slot1
       claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3:
-        postgresql_replication_slot: replica2_slot
+        postgresql_replication_slot: slot2
 
 verifier:
   name: testinfra
