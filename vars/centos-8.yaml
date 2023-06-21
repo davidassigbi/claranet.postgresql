@@ -1,12 +1,12 @@
 ---
-__postgresql_version: 10
+postgresql_version: 10
 _postgresql_data_dir: "{{ postgresql_data_dir | d('/var/lib/pgsql/data', true) }}"
-__postgresql_bin_path: "/usr/bin"
-__postgresql_config_path: "/var/lib/pgsql/data"
+_postgresql_bin_path: "{{ postgresql_bin_path | d('/usr/bin', true) }}"
+_postgresql_config_path: "{{ postgresql_config_path | d('/var/lib/pgsql/data', true) }}"
 _postgresql_daemon: "{{ postgresql_daemon | d('postgresql', true) }}"
-__postgresql_packages:
+_postgresql_packages:
   - postgresql
   - postgresql{{ postgresql_version }}-server
   - postgresql-contrib
-__postgresql_unix_socket_directories_mode: '0755'
+_postgresql_unix_socket_directories_mode: "{{ postgresql_unix_socket_directories_mode | d('0755', true) }}"
 postgresql_python_library: python3-psycopg2

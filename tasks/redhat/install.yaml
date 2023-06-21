@@ -27,9 +27,31 @@
     - ansible_distro not in ['fedora', 'amazon']
     - (ansible_distribution_major_version | int) >= 8
 
+- name: Prevent perl(IPC::Run) package missing that might occur while installing postgresql-devel
+  when:
+    - (ansible_os_family | lower) == 'redhat'
+    - ansible_distro not in ['fedora', 'amazon']
+    - (ansible_distribution_major_version | int) >= 8
+    # - false
+  block:
+    - name: Set perl-IPC-Run repo name
+      ansible.builtin.set_fact:
+        _perl_ipc_run_repo_name: "{{ (ansible_distribution_major_version | int >= 9) | ternary('crb', 'powertools') }}"
+
+    - name: Install EPEL release
+      ansible.builtin.dnf:
+        name: epel-release
+        state: present
+
+    - name: Install perl-IPC-Run
+      ansible.builtin.dnf:
+        name: perl-IPC-Run
+        state: present
+        enablerepo: "{{ _perl_ipc_run_repo_name }}"
+
 - name: Ensure PostgreSQL packages (including locales) are installed.
   ansible.builtin.dnf:
-    name: "{{ postgresql_packages + postgresql_locale_packages }}"
+    name: "{{ _postgresql_packages + postgresql_locale_packages }}"
     state: present
     enablerepo: "{{ postgresql_enablerepo | d(omit, true) }}"
     # Don't let postgresql-contrib cause the /usr/bin/python symlink

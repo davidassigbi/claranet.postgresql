@@ -12,6 +12,7 @@ _postgresql_dependencies_pip_packages:
   - ipaddress # needed by the postgresql_pg_hba module
   # - pg_activity[psycopg]
 
-__postgresql_apt_mirror_url: http://apt.postgresql.org/pub/repos/apt
-__postgresql_yum_mirror_url: https://download.postgresql.org/pub/repos/yum/reporpms
-_postgresql_repo_rpm_url: "{{ postgresql_mirror_url }}/{{ (ansible_distro == 'fedora') | ternary('F', 'EL') }}-{{ ansible_distribution_major_version }}-x86_64/pgdg-{{ (ansible_distro == 'fedora') | ternary('fedora', 'redhat') }}-repo-latest.noarch.rpm"
+_postgresql_apt_mirror_url: http://apt.postgresql.org/pub/repos/apt
+_postgresql_repo_rpm_url: "https://download.postgresql.org/pub/repos/yum/reporpms/{{ (ansible_distro == 'fedora') | ternary('F', 'EL') }}-{{ ansible_distribution_major_version }}-x86_64/pgdg-{{ (ansible_distro == 'fedora') | ternary('fedora', 'redhat') }}-repo-latest.noarch.rpm"
+_postgresql_unix_socket_directories_mode: "{{ postgresql_unix_socket_directories_mode | d('02775', true) }}"
+_postgresql_service_path: "{{ postgresql_service_path | d('', true) }}"

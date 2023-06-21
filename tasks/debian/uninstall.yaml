@@ -8,6 +8,6 @@
 
 - name: Purge all postgresql packages
   ansible.builtin.apt:
-    name: "{{ postgresql_packages | select('match', 'postgresql') }}"
+    name: "{{ _postgresql_packages | select('match', 'postgresql') }}"
     state: absent
     purge: true

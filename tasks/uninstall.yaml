@@ -4,7 +4,7 @@
     name: "{{ _postgresql_dependencies_pip_packages }}"
     state: absent
   environment:
-    PATH: "{{ ansible_env.PATH }}:{{ postgresql_bin_path }}"
+    PATH: "{{ ansible_env.PATH }}:{{ _postgresql_bin_path }}"
 
 - name: Remove backup directory
   ansible.builtin.file:

@@ -1,19 +1,19 @@
 ---
 - name: Configure global settings.
   ansible.builtin.lineinfile:
-    dest: "{{ postgresql_config_path }}/postgresql.conf"
+    dest: "{{ _postgresql_config_path }}/postgresql.conf"
     regexp: "^#?{{ item.option }}.+$"
     line: "{{ item.option }} = '{{ item.value }}'"
     state: "{{ item.state | default('present') }}"
     mode: 0644
-  loop: "{{ postgresql_autotune_config_options + postgresql_global_config_options + postgresql_global_config_options_extra }}"
+  loop: "{{ postgresql_autotune_config_options | community.general.lists_mergeby(postgresql_global_config_options, 'option') | community.general.lists_mergeby(postgresql_global_config_options_extra, 'option') }}"
   # diff: true
   notify: Restart postgresql
 
 - name: Configure host based authentication (if entries are configured).
   ansible.builtin.template:
     src: "pg_hba.conf.j2"
-    dest: "{{ postgresql_config_path }}/pg_hba.conf"
+    dest: "{{ _postgresql_config_path }}/pg_hba.conf"
     owner: "{{ postgresql_user }}"
     group: "{{ postgresql_group }}"
     backup: true
@@ -33,7 +33,7 @@
     state: directory
     owner: "{{ postgresql_user }}"
     group: "{{ postgresql_group }}"
-    mode: "{{ postgresql_unix_socket_directories_mode }}"
+    mode: "{{ _postgresql_unix_socket_directories_mode }}"
   loop: "{{ postgresql_unix_socket_directories }}"
 
 - name: Ensure postgresql service is running with latest up to date configuration

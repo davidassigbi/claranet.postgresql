@@ -85,7 +85,7 @@
 
     - name: Configure primary_slot_name in postgresql.conf on the replica
       ansible.builtin.lineinfile:
-        dest: "{{ postgresql_config_path }}/postgresql.conf"
+        dest: "{{ _postgresql_config_path }}/postgresql.conf"
         regexp: "^#?primary_slot_name.+$"
         line: "primary_slot_name = '{{ postgresql_replication_slot }}'"
         state: present
@@ -117,7 +117,7 @@
 
     - name: Configure replication settings on pg >= 12
       ansible.builtin.lineinfile:
-        dest: "{{ postgresql_config_path }}/postgresql.conf"
+        dest: "{{ _postgresql_config_path }}/postgresql.conf"
         regexp: "^#?{{ item.option }}.+$"
         line: "{{ item.option }} = '{{ item.value }}'"
         state: "{{ item.state | default('present') }}"

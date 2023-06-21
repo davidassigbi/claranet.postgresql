@@ -60,7 +60,7 @@ postgresql_global_config_options:
   - option: shared_preload_libraries
     value: '{{ postgresql_shared_preload_libraries | join(",") }}'
   - option: hba_file
-    value: "{{ postgresql_config_path }}/pg_hba.conf"
+    value: "{{ _postgresql_config_path }}/pg_hba.conf"
 
 
 # Host based authentication (hba) entries to be added to the pg_hba.conf. This
@@ -154,7 +154,7 @@ postgresql_pg_basebackup_checkpoint: fast   # spread
 postgresql_pg_basebackup_walmethod: stream  # none/stream/fetch
 postgresql_pg_basebackup_args: ""
 postgresql_pg_basebackup_cmd: >
-  {{ postgresql_bin_path }}/pg_basebackup
+  {{ _postgresql_bin_path }}/pg_basebackup
   --no-password
   --host {{ postgresql_replication_primary_address }}
   --port {{ postgresql_replication_primary_port }}
@@ -200,6 +200,7 @@ postgresql_autotune_url: "https://api.pgconfig.org/v1/tuning/get-config?format=c
 # Root directory containing the backups
 postgresql_backup_root_dir: /var/backups/postgresql
 postgresql_backup_script_dest: /var/backups/autopostgresqlbackup.sh
+postgreql_backup_create_database: true
 # Databases to backup or all to backup all databases
 postgresql_backup_dbnames: "all"
 # Databases to not backup. You can append more databases here.

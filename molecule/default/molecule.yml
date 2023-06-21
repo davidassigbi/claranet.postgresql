@@ -31,6 +31,10 @@ platforms:
     image: debian:11
 
   - <<: *default
+    name: debian12
+    image: debian:12
+
+  - <<: *default
     name: ubuntu18
     image: ubuntu:18.04
 
@@ -47,9 +51,9 @@ platforms:
   #   image: quay.io/centos/centos:centos8
   #   dockerfile: Dockerfile.centos8.j2
 
-  # - <<: *default
-  #   name: centosStream8
-  #   image: quay.io/centos/centos:stream8
+  - <<: *default
+    name: centosStream8
+    image: quay.io/centos/centos:stream8
 
   - <<: *default
     name: rocky8

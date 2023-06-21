@@ -19,7 +19,7 @@
 
 - name: Ensure PostgreSQL packages are installed.
   ansible.builtin.apt:
-    name: "{{ postgresql_packages }}"
+    name: "{{ _postgresql_packages }}"
     state: present
     update_cache: true
   environment: "{{ _postgresql_pkg_proxy_env }}"
@@ -37,5 +37,5 @@
   changed_when: true
   when:
     - _postgresql_packages_installation_res is changed
-    - postgresql_bin_path ~ '/initdb -D' in _postgresql_packages_installation_res.stdout
+    - _postgresql_bin_path ~ '/initdb -D' in _postgresql_packages_installation_res.stdout
   tags: skip_ansible_lint

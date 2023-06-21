@@ -1,10 +1,10 @@
 ---
 postgresql_version: 14
 _postgresql_data_dir: "{{ postgresql_data_dir | d('/var/lib/pgsql/data', true) }}"
-__postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"
-__postgresql_config_path: "/var/lib/pgsql/data"
+_postgresql_bin_path: "{{ postgresql_bin_path | d('/usr/pgsql-' ~ postgresql_version ~ '/bin', true) }}"
+_postgresql_config_path: "{{ postgresql_config_path | d('/var/lib/pgsql/data', true) }}"
 _postgresql_daemon: "{{ postgresql_daemon | d('postgresql-' ~ postgresql_version, true) }}"
-__postgresql_packages:
+_postgresql_packages:
   # needed for installing psycopg2
   - python3-pip
   - python3-devel
@@ -15,9 +15,6 @@ __postgresql_packages:
   - postgresql{{ postgresql_version }}-devel
   - nano
   - pg_activity
-__postgresql_unix_socket_directories_mode: '0755'
-__postgresql_mirror_url: https://download.postgresql.org/pub/repos/yum/reporpms
-_postgresql_repo_rpm_url: "{{ postgresql_mirror_url }}/{{ (ansible_distro == 'fedora') | ternary('F', 'EL') }}-{{ ansible_distribution_major_version }}-x86_64/pgdg-{{ (ansible_distro == 'fedora') | ternary('fedora', 'redhat') }}-repo-latest.noarch.rpm"
-
-__postgresql_service_path: /usr/lib/systemd/system/{{ postgresql_daemon }}.service
+_postgresql_unix_socket_directories_mode: "{{ postgresql_unix_socket_directories_mode | d('0755', true) }}"
 # postgresql_python_library: python3-psycopg2
+_postgresql_service_path: "{{ postgresql_service_path | d('/usr/lib/systemd/system/postgresql-' ~ postgresql_version ~ '.service', true) }}"

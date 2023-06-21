@@ -25,12 +25,12 @@
     - not _postgresql_pgdata_dir_version_res.stat.exists
   block:
     - name: Ensure PostgreSQL database is initialized.
-      # ansible.builtin.command: "{{ postgresql_bin_path }}/initdb -D {{ _postgresql_data_dir }}"
+      # ansible.builtin.command: "{{ _postgresql_bin_path }}/initdb -D {{ _postgresql_data_dir }}"
       ansible.builtin.command: >
         /usr/bin/pg_createcluster {{ postgresql_version }} main -d {{ _postgresql_data_dir }} -- {{ postgresql_initdb_extra_args }}
       register: _postgresql_initdb_res
       changed_when:
-        - postgresql_bin_path ~ '/initdb' in _postgresql_initdb_res.stdout
+        - _postgresql_bin_path ~ '/initdb' in _postgresql_initdb_res.stdout
         - "'Data directory' in _postgresql_initdb_res.stdout"
         - "'Error' not in _postgresql_initdb_res.stdout"
       become: true
@@ -42,7 +42,7 @@
   block:
     - name: Update PGDATA env var in the service file on redhat
       community.general.ini_file:
-        path: '{{ postgresql_service_path }}'
+        path: '{{ _postgresql_service_path }}'
         section: Service
         option: Environment
         value: PGDATA={{ _postgresql_data_dir }}
@@ -51,12 +51,12 @@
         - Reload systemd
         - Restart postgresql
       when:
-        - postgresql_service_path | length > 0
+        - _postgresql_service_path | length > 0
       tags: skip_ansible_lint
 
-      # ansible.builtin.command: "{{ postgresql_bin_path }}/postgresql-{{ postgresql_version }}-setup initdb {{ _postgresql_daemon }}"
+      # ansible.builtin.command: "{{ _postgresql_bin_path }}/postgresql-{{ postgresql_version }}-setup initdb {{ _postgresql_daemon }}"
     - name: Ensure PostgreSQL database is initialized
-      ansible.builtin.command: "{{ postgresql_bin_path }}/pg_ctl initdb -D {{ _postgresql_data_dir }} -o '{{ postgresql_initdb_extra_args }}'"
+      ansible.builtin.command: "{{ _postgresql_bin_path }}/pg_ctl initdb -D {{ _postgresql_data_dir }} -o '{{ postgresql_initdb_extra_args }}'"
       register: _postgresql_initdb_res
       # environment:
         # PGDATA: "{{ _postgresql_data_dir }}"
