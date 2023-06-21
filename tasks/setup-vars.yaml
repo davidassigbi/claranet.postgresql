@@ -5,10 +5,10 @@
   vars:
     params:
       files:
-        - "{{ ansible_distro }}-{{ ansible_distro_version }}.yaml"
-        - "{{ ansible_distro }}-{{ ansible_distro_release }}.yaml"
-        - "{{ ansible_distro }}-{{ ansible_distro_major_version }}.yaml"
-        - "{{ ansible_distro }}.yaml"
+        - "{{ ansible_distro | lower }}-{{ ansible_distro_version }}.yaml"
+        - "{{ ansible_distro | lower }}-{{ ansible_distro_release }}.yaml"
+        - "{{ ansible_distro | lower }}-{{ ansible_distro_major_version }}.yaml"
+        - "{{ ansible_distro | lower }}.yaml"
         - "{{ ansible_os_family | lower }}-{{ ansible_distro_major_version }}-family.yaml"
         - "{{ ansible_os_family | lower }}-family.yaml"
         - "{{ ansible_system | lower }}.yaml"
