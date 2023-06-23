@@ -1,4 +1,29 @@
 ---
+# - name: Create a dedicated virtual env for postgresql related libraries
+#   ansible.builtin.pip:
+#     name: pip
+#     extra_args: --upgrade
+#     virtualenv: "{{ _postgresql_virtualenv_path }}"
+#     virtualenv_command: python3 -m venv
+#   become_user: "{{ postgresql_user }}"
+#   environment:
+#     PATH: "{{ _postgresql_pythonized_path }}"
+
+# - name: Install pip dependencies
+#   ansible.builtin.pip:
+#     name: "{{ _postgresql_dependencies_pip_packages }}"
+#     virtualenv: "{{ _postgresql_virtualenv_path }}"
+#   become_user: "{{ postgresql_user }}"
+#   environment:
+#     PATH: "{{ _postgresql_pythonized_path }}"
+
+# - name: Import user management tasks
+#   ansible.builtin.import_tasks: users.yaml
+#   when: not postgresql_replication or postgresql_replication_role == "primary"
+#   tags:
+#     - user
+#     - users
+
 # - name: End play
 #   ansible.builtin.meta: end_play
 #   tags: always

@@ -30,3 +30,4 @@
   become_user: "{{ postgresql_user }}"
   vars:
     ansible_ssh_pipelining: true
+    ansible_python_interpreter: "{{ _postgresql_ansible_python_interpreter }}"

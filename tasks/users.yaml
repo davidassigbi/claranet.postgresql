@@ -30,5 +30,7 @@
   become_user: "{{ postgresql_user }}"
   environment:
     PGOPTIONS: "{{ (postgresql_auth_method == 'scram-sha-256') | ternary('-c password_encryption=scram-sha-256', '') }}"
+    PATH: "{{ _postgresql_pythonized_path }}"
   vars:
     ansible_ssh_pipelining: true
+    ansible_python_interpreter: "{{ _postgresql_ansible_python_interpreter }}"
