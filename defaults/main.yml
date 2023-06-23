@@ -105,6 +105,20 @@ postgresql_users: []
 # Whether to output user data when managing users.
 postgres_users_no_log: true
 
+
+# Manage privileges per postgresql roles
+postgresql_privs:
+  - roles: role1,role2
+    db: acme
+    privs: ALL
+    objs: ALL_IN_SCHEMA
+    type: table
+    schema: public
+    grant_option: true
+
+# Manage group/role memberships
+postgresql_memberships: []
+
 # Extensions management per database
 postgresql_extensions: []
 
