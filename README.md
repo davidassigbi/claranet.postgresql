@@ -73,7 +73,8 @@ Fedora 35| No   | No   | No  | No  | No
 Fedora 36| No   | No   | No  | No  | No
 Fedora 37| No   | No   | No  | No  | No
 Fedora 38| No   | No   | No  | No  | No
-Redhat 8,9        | No  | No  | No  | No  | No
+Redhat 8        | No  | No  | No  | No  | No
+Redhat 9        | No  | No  | No  | No  | No
 
 ### Proxy usage
 ----
@@ -85,3 +86,59 @@ The variables `postgresql_http_pkg_proxy` and `postgresql_https_pkg_proxy` can b
 
 Note: These variables are translated to environnement variables http_proxy and https_proxy which are passed to corresponding tasks.
 
+
+
+### Create/Remove database users
+----
+
+### Setting user privileges on databases and tables
+----
+
+### Create/Remove databases
+----
+
+### Physical Replication
+----
+
+### Advanced customized installation
+----
+
+## :pencil2: Full Example Playbook
+
+```yaml
+---
+```
+
+
+## :gear: Role variables
+
+Variable name                              | Default value                           | Notes                                                                                                        |
+------------------------------------------ |-----------------------------------------|--------------------------------------------------------------------------------------------------------------|
+postgresql_version                            | "14"                                  |
+postgresql_debug                              | false                                   | Controls wether or not to show debug infos. Activating this will potentially make ansible output some postgresql credentials       
+
+
+
+PostgreSQL configuration variables
+----
+The following variables are defined and correspond to their respective postgresql configuration variable used in `postgresql.conf` file without the prefix `postgresql_` .
+
+Variable name                                    | Default value                     | Notes                                                                                                        |
+------------------------------------------------ |---------------------------------- |------------------------------------------------------------------------------------------------------------- |
+postgresql_port                                     | "5432"                            |
+
+
+## :closed_lock_with_key: [Hardening](HARDENING.md)
+
+## :heart_eyes_cat: [Contributing](CONTRIBUTING.md)
+Checkout the [Contributing](CONTRIBUTING.md) if you are looking for a guide on how to setup an environnement so you can test this role as a developper.
+
+
+## :copyright: [License](LICENSE)
+
+[Mozilla Public License Version 2.0](https://www.mozilla.org/en-US/MPL/2.0/)
+
+## Author information
+
+Proudly made by the Claranet team and inspired by:
+- [Jeff Geerling](https://github.com/geerlingguy/ansible-role-postgresql)
