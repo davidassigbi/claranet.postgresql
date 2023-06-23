@@ -14,13 +14,6 @@ _postgresql_packages:
   - postgresql{{ postgresql_version }}-contrib
   - postgresql{{ postgresql_version }}-devel
   - nano
-  # - pg_activity # errors where occuring while installing this package on rocky linux 9 so we switched to the python package
-
-_postgresql_dependencies_pip_packages:
-  - psycopg2 # most modules of the community.postgresql collection
-  - ipaddress # needed by the postgresql_pg_hba module
-  - pg_activity[psycopg] 
-
+  - pg_activity
 _postgresql_unix_socket_directories_mode: "{{ postgresql_unix_socket_directories_mode | d('0755', true) }}"
-# postgresql_python_library: python3-psycopg2
 _postgresql_service_path: "{{ postgresql_service_path | d('/usr/lib/systemd/system/postgresql-' ~ postgresql_version ~ '.service', true) }}"
