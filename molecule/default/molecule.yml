@@ -9,8 +9,8 @@ platforms:
   # On "${name:-${image:-debian}", the last brace does not miss, it works like that...
   # The env var should be used when the image variable refers to a full registry path like registry.access.redhat.com/ubi8/ubi
   - &default
-    name: debian10
-    image: debian:10
+    name: debian12
+    image: debian:12
     # name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}
     # image: ${image:-debian}:${tag:-latest}
     privileged: true
@@ -26,50 +26,62 @@ platforms:
     command: "/lib/systemd/systemd"
     cgroupns_mode: host
 
-  - <<: *default
-    name: debian11
-    image: debian:11
+  # - <<: *default
+  #   name: debian11
+  #   image: debian:11
 
-  - <<: *default
-    name: debian12
-    image: debian:12
+  # - <<: *default
+  #   name: debian12
+  #   image: debian:12
 
-  - <<: *default
-    name: ubuntu18
-    image: ubuntu:18.04
+  # - <<: *default
+  #   name: ubuntu18
+  #   image: ubuntu:18.04
 
-  - <<: *default
-    name: ubuntu20
-    image: ubuntu:20.04
+  # - <<: *default
+  #   name: ubuntu20
+  #   image: ubuntu:20.04
 
   - <<: *default
     name: ubuntu22
     image: ubuntu:22.04
 
-  # - <<: *default
+  # - <<: *default # EOL reached https://www.centos.org/centos-linux-eol/
   #   name: centos8
   #   image: quay.io/centos/centos:centos8
-  #   dockerfile: Dockerfile.centos8.j2
+  #   # dockerfile: Dockerfile.centos8.j2
 
-  - <<: *default
-    name: centosStream8
-    image: quay.io/centos/centos:stream8
+  # - <<: *default
+  #   name: centosStream8
+  #   image: quay.io/centos/centos:stream8
 
-  - <<: *default
-    name: rocky8
-    image: rockylinux:8.7
+  # - <<: *default
+  #   name: ol7
+  #   image: oraclelinux:7
+
+  # - <<: *default
+  #   name: rocky8
+  #   image: rockylinux:8.7
 
   - <<: *default
     name: rocky9
     image: rockylinux:9.1
 
-  - <<: *default
-    name: fedora36
-    image: fedora:36
+  # - <<: *default
+  #   name: amazonlinux2
+  #   image: amazonlinux:2.0.20230307.0
+
+  # - <<: *default
+  #   name: fedora36
+  #   image: fedora:36
+
+  # - <<: *default
+  #   name: fedora37
+  #   image: fedora:37
 
   - <<: *default
-    name: fedora37
-    image: fedora:37
+    name: fedora38
+    image: fedora:38
 
 provisioner:
   name: ansible
