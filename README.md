@@ -56,6 +56,25 @@ Database management     | db, database, databases
 Extensions management   | ext, extension, extensions
 
 
+Linux/PostgreSQL versions supported
+-----
+
+Linux/PostgreSQL     |  11  |  12  |  13  |  14  |  15  
+------------------|:----:|:----:|:----:|:----:|:----:
+Debian 10         | No   | No   | No  | No  | No
+Debian 11         | No   | No   | No  | No  | No
+Debian 12         | No   | No   | No  | No  | No
+Ubuntu 18.04      | No  | No  | No  | No  | No
+Ubuntu 20.04      | No  | No  | No  | No  | No
+Ubuntu 22.04      | No   | No   | No   | No  | No
+CentOS 8 | No  | No  | No  | No  | No
+CentOS Stream8  | No  | No  | No  | No  | No
+Fedora 35| No   | No   | No  | No  | No
+Fedora 36| No   | No   | No  | No  | No
+Fedora 37| No   | No   | No  | No  | No
+Fedora 38| No   | No   | No  | No  | No
+Redhat 8,9        | No  | No  | No  | No  | No
+
 ### Proxy usage
 ----
 This role supports use of proxies.
