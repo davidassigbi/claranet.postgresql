@@ -19,55 +19,10 @@
     path: "{{ _postgresql_data_dir }}/PG_VERSION"
   register: _postgresql_pgdata_dir_version_res
 
-- name: Initialize new cluster on debian os family
+- name: Include initialization tasks for os family {{ ansible_os_family | lower }}
   when:
-    - ansible_os_family | lower == 'debian'
-    - not _postgresql_pgdata_dir_version_res.stat.exists
-  block:
-    - name: Ensure PostgreSQL database is initialized.
-      # ansible.builtin.command: "{{ _postgresql_bin_path }}/initdb -D {{ _postgresql_data_dir }}"
-      ansible.builtin.command: >
-        /usr/bin/pg_createcluster {{ postgresql_version }} main -d {{ _postgresql_data_dir }} -- {{ postgresql_initdb_extra_args }}
-      register: _postgresql_initdb_res
-      changed_when:
-        - _postgresql_bin_path ~ '/initdb' in _postgresql_initdb_res.stdout
-        - "'Data directory' in _postgresql_initdb_res.stdout"
-        - "'Error' not in _postgresql_initdb_res.stdout"
-      become: true
-      become_user: root
-
-- name: Initialize new cluster on redhat os family
-  when:
-    - ansible_os_family | lower == 'redhat'
-  block:
-    - name: Update PGDATA env var in the service file on redhat
-      community.general.ini_file:
-        path: '{{ _postgresql_service_path }}'
-        section: Service
-        option: Environment
-        value: PGDATA={{ _postgresql_data_dir }}
-        state: present
-      notify:
-        - Reload systemd
-        - Restart postgresql
-      when:
-        - _postgresql_service_path | length > 0
-      tags: skip_ansible_lint
-
-      # ansible.builtin.command: "{{ _postgresql_bin_path }}/postgresql-{{ postgresql_version }}-setup initdb {{ _postgresql_daemon }}"
-    - name: Ensure PostgreSQL database is initialized
-      ansible.builtin.command: "{{ _postgresql_bin_path }}/pg_ctl initdb -D {{ _postgresql_data_dir }} -o '{{ postgresql_initdb_extra_args }}'"
-      register: _postgresql_initdb_res
-      # environment:
-        # PGDATA: "{{ _postgresql_data_dir }}"
-        # PGSETUP_INITDB_OPTIONS: "-D {{ _postgresql_data_dir }} {{ postgresql_initdb_extra_args }}"
-        # PGSETUP_INITDB_OPTIONS: "{{ postgresql_initdb_extra_args }}"
-      changed_when:
-        - '"Success" in _postgresql_initdb_res.stdout'
-        # - '"OK" in _postgresql_initdb_res.stdout'
-      when: not _postgresql_pgdata_dir_version_res.stat.exists
-      become: true
-      become_user: "{{ postgresql_user }}"
+    - ansible_os_family | lower in ['debian', 'redhat']
+  ansible.builtin.include_tasks: "{{ ansible_os_family | lower }}/initialize.yaml"
 
 - name: Ensure PostgreSQL log directory exists.
   ansible.builtin.file:
