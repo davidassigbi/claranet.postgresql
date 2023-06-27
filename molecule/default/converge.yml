@@ -6,53 +6,17 @@
 
   vars:
     postgres_users_no_log: false
-    postgresql_databases:
-      - name: example
-        encoding: UTF-8
-        lc_collate: en_US.UTF-8
-        lc_ctype: en_US.UTF-8
-        conn_limit: 100
-        template: template0
-      - name: nreslou
-      - name: toto
-        state: absent
-
-    postgresql_extensions:
-      - name: pg_stat_statements
-        db: nreslou
-
     postgresql_users:
-      - name: nreslou
       - name: group1
         role_attr_flags: NOLOGIN
+      - name: group2
+        role_attr_flags: NOLOGIN
       - name: user1
-        db: nreslou
+      - name: user2
       - name: jdoe
-        password: s3cur3
-        db: example
+        password: password
         comment: this is a test user
         expires: "Jun 21 2029"
-
-    postgresql_privs:
-      - roles: group1,user1 # group1 and user1 are granted all privs on all object wihtin the public schema of the example db
-        db: example
-        privs: ALL
-        objs: ALL_IN_SCHEMA
-        type: table
-        schema: public
-        grant_option: true
-      - roles: nreslou # grant nreslou user all privs on nreslou database by first connecting to the postgres maintenance db
-        db: postgres
-        type: database
-        privs: ALL
-        objs: nreslou
-        grant_option: true
-      # - roles: nreslou
-      #   db: nreslou
-      #   type: function
-      #   objs: add(int:int)
-      #   privs: ALL
-      #   grant_option: true
 
     postgresql_memberships:
       - groups:
@@ -61,16 +25,143 @@
           - user1
         state: present
       - groups:
-          - group1
+          - group2
         target_roles:
-          - jdoe
+          - user2
         state: absent
       - groups: []
         target_roles:
-          - nreslou
+          - jdoe
         state: exact
 
+    postgresql_tablespaces:
+      - name: ssd
+        set:
+          random_page_cost: 1
+          seq_page_cost: 1
+        owner: jdoe
+        location: /tmp/ssd
+        # state: absent
+      # - name: ssd
+      # - name: temp2
+      #   set:
+      #     random_page_cost: 1
+      #     seq_page_cost: 1
+      #   state: absent
+
+    postgresql_databases:
+      - name: db1
+        owner: user1
+        encoding: UTF-8
+        lc_collate: en_US.UTF-8
+        lc_ctype: en_US.UTF-8
+        conn_limit: 100
+        template: template0
+      - name: db2
+        owner: user2
+      - name: db3
+        state: absent
+
+    postgresql_extensions:
+      - name: pg_stat_statements
+        db: db1
+
+    postgresql_schemas:
+      - name: acme
+        db: db1
+      - name: acme
+        db: db2
+
+    postgresql_tables:
+      - name: table1
+        db: db1
+        owner: user1
+        columns:
+          - id SERIAL PRIMARY KEY
+          - name VARCHAR(50)
+          - age INT
+          - email VARCHAR(100)
+        tablespace: ssd
+        storage_params:
+          - fillfactor=10
+          - autovacuum_analyze_threshold=1
+      - name: acme.table2
+        db: db1
+        columns: waste_id int
+        unlogged: true
+        # like: public.table1
+        # including: comments, indexes
+      # - name: table2
+      #   db: db1
+      #   truncate: true
+      # - name: acme.table2
+      #   db: db1
+      #   like: public.table2
+      # - name: table2
+      #   db: db2
+      #   state: absent
+      #   cascade: true
+
+    postgresql_queries:
+      - query:
+          - SELECT version()
+        db: db1
+      - query:
+          - select * from public.table1
+        db: db1
+    postgresql_scripts:
+      - path: /tmp/insert_in_table1.sql
+        db: db1
+
+    postgresql_privs:
+      - roles: group1,user1 # group1 and user1 are granted all privs on all object wihtin the public schema of the example db
+        db: db1
+        privs: ALL
+        objs: ALL_IN_SCHEMA
+        type: table
+        schema: public
+        grant_option: true
+      - roles: user2 # grant nreslou user all privs on nreslou database by first connecting to the postgres maintenance db
+        db: postgres
+        type: database
+        privs: ALL
+        objs: db1,db2
+        grant_option: true
+      # - roles: user1
+      #   db: db2
+      #   type: function
+      #   objs: add(int:int)
+      #   privs: ALL
+      #   grant_option: true
+
+    postgresql_ownerships:
+      - db: db1
+        new_owner: user1
+        obj_name: table1
+        obj_type: table
+      - db: db2 # reassign all db object owned by jdoe in db nreslou to role nreslou
+        new_owner: user2
+        reassign_owned_by: user1
+
   pre_tasks:
+    - name: Create /tmp/ssd
+      ansible.builtin.file:
+        path: /tmp/ssd
+        state: directory
+        mode: 0777
+        owner: postgres
+        group: postgres
+      tags: always
+    - name: Copy temporary sql script
+      ansible.builtin.copy:
+        content: select version();
+          # INSERT INTO table1 (name, age, email) VALUES
+          # ('John Doe', 30, 'john.doe@example.com'),
+          # ('Jane Smith', 25, 'jane.smith@example.com'),
+          # ('Michael Johnson', 40, 'michael.johnson@example.com');
+        dest: /tmp/insert_in_table1.sql
+        mode: 0555
+      tags: always
     # The Fedora 30+ container images have only C.UTF-8 installed
     # - name: Set database locale if using Fedora 30+ or RedHat 8+
     #   ansible.builtin.set_fact:

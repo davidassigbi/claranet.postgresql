@@ -9,8 +9,12 @@
 #       ansible_distribution_version: "{{ ansible_distribution_version }}"
 #       ansible_distribution_major_version: "{{ ansible_distribution_major_version }}"
 #       ansible_distribution_release: "{{ ansible_distribution_release }}"
-- name: users.yaml
+
+- name: Include users.yaml
   ansible.builtin.include_tasks: tasks/users.yaml
+
+- name: Include databases.yaml
+  ansible.builtin.include_tasks: tasks/databases.yaml
 
 - name: End play
   ansible.builtin.meta: end_play

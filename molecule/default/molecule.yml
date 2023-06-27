@@ -42,9 +42,9 @@ platforms:
   #   name: ubuntu20
   #   image: ubuntu:20.04
 
-  - <<: *default
-    name: ubuntu22
-    image: ubuntu:22.04
+  # - <<: *default
+  #   name: ubuntu22
+  #   image: ubuntu:22.04
 
   # - <<: *default # EOL reached https://www.centos.org/centos-linux-eol/
   #   name: centos8
@@ -63,9 +63,9 @@ platforms:
   #   name: rocky8
   #   image: rockylinux:8.7
 
-  - <<: *default
-    name: rocky9
-    image: rockylinux:9.1
+  # - <<: *default
+  #   name: rocky9
+  #   image: rockylinux:9.1
 
   # - <<: *default
   #   name: amazonlinux2
@@ -79,9 +79,9 @@ platforms:
   #   name: fedora37
   #   image: fedora:37
 
-  - <<: *default
-    name: fedora38
-    image: fedora:38
+  # - <<: *default
+  #   name: fedora38
+  #   image: fedora:38
 
 provisioner:
   name: ansible

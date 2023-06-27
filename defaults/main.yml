@@ -73,22 +73,11 @@ postgresql_hba_entries:
   - {contype: host, databases: all, users: all, address: '::1/128', method: "{{ postgresql_auth_method }}"}
 postgresql_hba_extra_entries: []
 
-# Databases to ensure exist.
-postgresql_databases: []
-# - name: exampledb # required; the rest are optional
-#   lc_collate: # defaults to 'en_US.UTF-8'
-#   lc_ctype: # defaults to 'en_US.UTF-8'
-#   encoding: # defaults to 'UTF-8'
-#   template: # defaults to 'template0'
-#   login_host: # defaults to 'localhost'
-#   login_password: # defaults to not set
-#   login_user: # defaults to '{{ postgresql_user }}'
-#   login_unix_socket: # defaults to 1st of postgresql_unix_socket_directories
-#   port: # defaults to not set
-#   owner: # defaults to postgresql_user
-#   state: # defaults to 'present'
 
-# Users to ensure exist.
+# Manage tablespaces
+postgresql_tablespaces: []
+
+# Manage roles/users.
 postgresql_users: []
 # - name: jdoe #required; the rest are optional
 #   password: # defaults to not set
@@ -105,22 +94,42 @@ postgresql_users: []
 # Whether to output user data when managing users.
 postgres_users_no_log: true
 
-
-# Manage privileges per postgresql roles
-postgresql_privs:
-  - roles: role1,role2
-    db: acme
-    privs: ALL
-    objs: ALL_IN_SCHEMA
-    type: table
-    schema: public
-    grant_option: true
-
 # Manage group/role memberships
 postgresql_memberships: []
 
+# Databases to ensure exist.
+postgresql_databases: []
+# - name: exampledb # required; the rest are optional
+#   lc_collate: # defaults to 'en_US.UTF-8'
+#   lc_ctype: # defaults to 'en_US.UTF-8'
+#   encoding: # defaults to 'UTF-8'
+#   template: # defaults to 'template0'
+#   login_host: # defaults to 'localhost'
+#   login_password: # defaults to not set
+#   login_user: # defaults to '{{ postgresql_user }}'
+#   login_unix_socket: # defaults to 1st of postgresql_unix_socket_directories
+#   port: # defaults to not set
+#   owner: # defaults to postgresql_user
+#   state: # defaults to 'present'
+
+# Manage privileges per postgresql roles
+postgresql_privs: []
+  # - roles: role1,role2
+  #   db: acme
+  #   privs: ALL
+  #   objs: ALL_IN_SCHEMA
+  #   type: table
+  #   schema: public
+  #   grant_option: true
+
 # Extensions management per database
 postgresql_extensions: []
+
+# Inline query strings to run
+postgresql_queries: []
+
+# SQL script files to run
+postgresql_scripts: []
 
 
 # Replication slots
