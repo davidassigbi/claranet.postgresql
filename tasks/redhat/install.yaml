@@ -19,7 +19,7 @@
       stream=
       profiles=
       state=disabled
-    mode: 0600
+    mode: '0600'
     owner: root
     group: root
   when:

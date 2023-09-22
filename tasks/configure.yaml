@@ -5,8 +5,10 @@
     regexp: "^#?{{ item.option }}.+$"
     line: "{{ item.option }} = '{{ item.value }}'"
     state: "{{ item.state | default('present') }}"
-    mode: 0644
-  loop: "{{ postgresql_autotune_config_options | community.general.lists_mergeby(postgresql_global_config_options, 'option') | community.general.lists_mergeby(postgresql_global_config_options_extra, 'option') }}"
+    mode: '0644'
+  loop: "{{ postgresql_autotune_config_options |
+    community.general.lists_mergeby(postgresql_global_config_options, 'option') |
+    community.general.lists_mergeby(postgresql_global_config_options_extra, 'option') }}"
   # diff: true
   notify: Restart postgresql
 
