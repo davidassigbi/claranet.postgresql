@@ -5,6 +5,8 @@
   gather_facts: true
 
   vars:
+    # postgresql_version: 16
+    postgresql_autotune_base_url: http://192.168.56.101:3000
     postgres_users_no_log: false
     postgresql_users:
       - name: group1
@@ -41,6 +43,9 @@
           seq_page_cost: 1
         owner: jdoe
         location: /tmp/ssd
+        location_create: true
+        # location_owner: "{{ postgresql_user }}"
+        # location_group: "{{ postgresql_user }}"
         # state: absent
       # - name: ssd
       # - name: temp2
@@ -103,8 +108,7 @@
       #   cascade: true
 
     postgresql_queries:
-      - query:
-          - SELECT version()
+      - query: SELECT version()
         db: db1
       - query:
           - select * from public.table1
@@ -114,12 +118,12 @@
         db: db1
 
     postgresql_privs:
-      - roles: group1,user1 # group1 and user1 are granted all privs on all object wihtin the public schema of the example db
+      - roles: group1 # group1 and user1 are granted all privs on all object wihtin the public schema of the example db
         db: db1
         privs: ALL
-        objs: ALL_IN_SCHEMA
+        objs: table1
         type: table
-        schema: public
+        # schema: public
         grant_option: true
       - roles: user2 # grant nreslou user all privs on nreslou database by first connecting to the postgres maintenance db
         db: postgres
@@ -139,19 +143,19 @@
         new_owner: user1
         obj_name: table1
         obj_type: table
-      - db: db2 # reassign all db object owned by jdoe in db nreslou to role nreslou
-        new_owner: user2
-        reassign_owned_by: user1
+      # - db: db2 # reassign all dbs owned by user1 to user2 and all objects in db2 to user2
+      #   new_owner: user2
+      #   reassign_owned_by: user1
 
   pre_tasks:
-    - name: Create /tmp/ssd
-      ansible.builtin.file:
-        path: /tmp/ssd
-        state: directory
-        mode: 0777
-        owner: postgres
-        group: postgres
-      tags: always
+    # - name: Create /tmp/ssd
+    #   ansible.builtin.file:
+    #     path: /tmp/ssd
+    #     state: directory
+    #     mode: 0777
+    #     owner: postgres
+    #     group: postgres
+    #   tags: always
     - name: Copy temporary sql script
       ansible.builtin.copy:
         content: select version();
@@ -160,7 +164,7 @@
           # ('Jane Smith', 25, 'jane.smith@example.com'),
           # ('Michael Johnson', 40, 'michael.johnson@example.com');
         dest: /tmp/insert_in_table1.sql
-        mode: 0555
+        mode: '0555'
       tags: always
     # The Fedora 30+ container images have only C.UTF-8 installed
     # - name: Set database locale if using Fedora 30+ or RedHat 8+

@@ -207,7 +207,8 @@ postgresql_autotune_include_badger: false
 postgresql_autotune_cpus: "{{ ansible_processor_nproc | d('') }}"
 postgresql_autotune_total_ram: "{{ ((ansible_memtotal_mb / 1024) | round | int) | d('') }}"
 postgresql_autotune_pg_version: "{{ postgresql_version }}"
-postgresql_autotune_url: "https://api.pgconfig.org/v1/tuning/get-config?format=conf\
+postgresql_autotune_base_url: https://api.pgconfig.org
+postgresql_autotune_url: "{{ postgresql_autotune_base_url }}/v1/tuning/get-config?format=conf\
   &include_pgbadger={{ postgresql_autotune_include_badger }}\
   &log_format=csvlog&max_connections={{ postgresql_max_connections }}\
   &pg_version={{ postgresql_version }}\
