@@ -1,6 +1,7 @@
 ---
 dependency:
-  name: galaxy
+  name: shell
+  command: python3 -m pip install pytest-testinfra
 
 driver:
   name: docker
@@ -9,8 +10,10 @@ platforms:
   # On "${name:-${image:-debian}", the last brace does not miss, it works like that...
   # The env var should be used when the image variable refers to a full registry path like registry.access.redhat.com/ubi8/ubi
   - &default
-    name: debian12
-    image: debian:12
+    name: debian11
+    image: debian:11
+    # name: rocky8 
+    # image: rockylinux:8.7
     # name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}
     # image: ${image:-debian}:${tag:-latest}
     privileged: true
@@ -91,11 +94,17 @@ provisioner:
     v: true
   ansible_args:
     - -v
-    - --tags=always,install,init,config,users,db,ext,backup,uninstall,autotune
+    # - --tags=always,uninstall
+    # - --tags=always,owner
+    # - --tags=always,install,init,autotune,config,users,tbspc,db,owner
+    - --tags=always,install,init,autotune,config,users,tbspc,db,owner,ext,query,backup,uninstall
+    # autotune
   inventory:
     group_vars:
       all:
         postgresql_debug: true
+        # postgresql_uninstall_1: true
+        # postgresql_uninstall_2: true
       replica:
         var: value
     host_vars:

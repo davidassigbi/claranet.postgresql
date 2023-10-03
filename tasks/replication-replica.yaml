@@ -62,6 +62,16 @@
         group: "{{ postgresql_user }}"
         mode: "400"
 
+    # creating the replication slot from an ansible task instead of 
+    # using the parameter --create-slot of pg_basebackup because if
+    # the slot already exists an error is thrown whilst an ansible 
+    # task is much more error resilient
+    # But the question is that, is it possible that the pgbasebackup 
+    # is run while the slot already exists ?
+    # And also, what happens to the slot if it is created by pgbasebackup
+    # is it deleted after the pgbasebackup
+    # if we want to build a replication on an existing server, does the 
+    # existing slot contain all of the required data ?
     - name: Ensure physical replication slot exists on the primary
       community.postgresql.postgresql_slot:
         name: "{{ postgresql_replication_slot }}"

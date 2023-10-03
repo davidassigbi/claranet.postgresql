@@ -10,12 +10,14 @@
 
 - name: Import uninstallation tasks
   ansible.builtin.import_tasks: uninstall.yaml
-  tags: uninstall
+  tags: uninstallation
   when: postgresql_uninstall_1 | bool and postgresql_uninstall_2 | bool
 
 - name: Import installation tasks
   ansible.builtin.import_tasks: install.yaml
-  tags: install
+  tags:
+    - install
+    - installation
 
 - name: Import initialization tasks
   ansible.builtin.import_tasks: initialize.yaml
@@ -38,6 +40,10 @@
     - configure
     - configuration
 
+# - name: Stop after postgresql installation and configuration
+#   ansible.builtin.meta: end_host
+#   tags: always
+
 - name: Import primary replication tasks
   ansible.builtin.import_tasks: replication-primary.yaml
   when:
@@ -58,9 +64,9 @@
 
 - name: Import backup tasks
   ansible.builtin.import_tasks: backup.yaml
+  when: postgresql_backup | bool
   tags: backup
 
-# Configure PostgreSQL.
 - name: Import user management tasks
   ansible.builtin.import_tasks: users.yaml
   when: not postgresql_replication or postgresql_replication_role == "primary"
@@ -70,9 +76,8 @@
 
 - name: Import tablespace tasks
   ansible.builtin.import_tasks: tablespaces.yaml
-  # when: not postgresql_replication or postgresql_replication_role == "primary"
   tags:
-    - tbspc
+    - tblspc
     - tablespace
     - tablespaces
 
@@ -91,6 +96,9 @@
     - owner
     - owners
     - ownership
+    - priv
+    - privs
+    - privileges
 
 - name: Import extensions tasks
   ansible.builtin.import_tasks: extensions.yaml
@@ -100,7 +108,7 @@
     - extension
     - extensions
 
-- name: Import sql scrip and queries tasks
+- name: Import sql script and queries tasks
   ansible.builtin.import_tasks: sql.yaml
   when: not postgresql_replication or postgresql_replication_role == "primary"
   tags:

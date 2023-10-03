@@ -1,1 +1,46 @@
 ---
+# - name: Import tablespace tasks
+#   ansible.builtin.import_tasks: tablespaces.yaml
+#   tags:
+#     - tbspc
+#     - tablespace
+#     - tablespaces
+
+# - name: Import extensions tasks
+#   ansible.builtin.import_tasks: extensions.yaml
+#   when: not postgresql_replication or postgresql_replication_role == "primary"
+#   tags:
+#     - ext
+#     - extension
+#     - extensions
+
+
+# - name: Show variables
+#   ansible.builtin.debug:
+#     var: v
+#   vars:
+#     v:
+#       ansible_distribution: "{{ ansible_distribution }}"
+#       ansible_os_family: "{{ ansible_os_family }}"
+#       ansible_distribution_version: "{{ ansible_distribution_version }}"
+#       ansible_distribution_major_version: "{{ ansible_distribution_major_version }}"
+#       ansible_distribution_release: "{{ ansible_distribution_release }}"
+
+# - name: Include users.yaml
+#   ansible.builtin.include_tasks: tasks/users.yaml
+
+# - name: Include users.yaml
+#   ansible.builtin.include_tasks: tasks/tablespaces.yaml
+
+# - name: Include databases.yaml
+#   ansible.builtin.include_tasks: tasks/databases.yaml
+
+# - name: Include users.yaml
+#   ansible.builtin.include_tasks: tasks/ownerships.yaml
+
+# - name: Include users.yaml
+#   ansible.builtin.include_tasks: tasks/sql.yaml
+
+# - name: End play
+#   ansible.builtin.meta: end_play
+#   tags: always

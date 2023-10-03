@@ -1,6 +1,6 @@
 {
-    "python.defaultInterpreterPath": "/home/davidassigbi/miniconda3/envs/claranet/bin/python",
-    "ansible.python.interpreterPath": "/home/davidassigbi/miniconda3/envs/claranet/bin/python",
+    "python.defaultInterpreterPath": "/home/davidassigbi/miniconda3/envs/molecule/bin/python",
+    "ansible.python.interpreterPath": "/home/davidassigbi/miniconda3/envs/molecule/bin/python",
     "yaml.schemas": {
         "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook": "",
         "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/tasks": [

@@ -5,148 +5,13 @@
   gather_facts: true
 
   vars:
-    # postgresql_version: 16
+    # postgresql_version: 15
+    postgresql_autotune: true
+    postgresql_replication: true
     postgresql_autotune_base_url: http://192.168.56.101:3000
-    postgres_users_no_log: false
-    postgresql_users:
-      - name: group1
-        role_attr_flags: NOLOGIN
-      - name: group2
-        role_attr_flags: NOLOGIN
-      - name: user1
-      - name: user2
-      - name: jdoe
-        password: password
-        comment: this is a test user
-        expires: "Jun 21 2029"
+  vars_files:
+    - vars/main.yaml
 
-    postgresql_memberships:
-      - groups:
-          - group1
-        target_roles:
-          - user1
-        state: present
-      - groups:
-          - group2
-        target_roles:
-          - user2
-        state: absent
-      - groups: []
-        target_roles:
-          - jdoe
-        state: exact
-
-    postgresql_tablespaces:
-      - name: ssd
-        set:
-          random_page_cost: 1
-          seq_page_cost: 1
-        owner: jdoe
-        location: /tmp/ssd
-        location_create: true
-
-        # location_owner: "{{ postgresql_user }}"
-        # location_group: "{{ postgresql_user }}"
-        # state: absent
-      # - name: ssd
-      # - name: temp2
-      #   set:
-      #     random_page_cost: 1
-      #     seq_page_cost: 1
-      #   state: absent
-
-    postgresql_databases:
-      - name: db1
-        owner: user1
-        encoding: UTF-8
-        lc_collate: en_US.UTF-8
-        lc_ctype: en_US.UTF-8
-        conn_limit: 100
-        template: template0
-      - name: db2
-        owner: user2
-      - name: db3
-        state: absent
-
-    postgresql_extensions:
-      - name: pg_stat_statements
-        db: db1
-
-    postgresql_schemas:
-      - name: acme
-        db: db1
-      - name: acme
-        db: db2
-
-    postgresql_tables:
-      - name: table1
-        db: db1
-        owner: user1
-        columns:
-          - id SERIAL PRIMARY KEY
-          - name VARCHAR(50)
-          - age INT
-          - email VARCHAR(100)
-        tablespace: ssd
-        storage_params:
-          - fillfactor=10
-          - autovacuum_analyze_threshold=1
-      - name: acme.table2
-        db: db1
-        columns: waste_id int
-        unlogged: true
-        # like: public.table1
-        # including: comments, indexes
-      # - name: table2
-      #   db: db1
-      #   truncate: true
-      # - name: acme.table2
-      #   db: db1
-      #   like: public.table2
-      # - name: table2
-      #   db: db2
-      #   state: absent
-      #   cascade: true
-
-    postgresql_queries:
-      - query: SELECT version()
-        db: db1
-      - query:
-          - select * from public.table1
-        db: db1
-    postgresql_scripts:
-      - path: /tmp/insert_in_table1.sql
-        db: db1
-
-    postgresql_privs:
-      - roles: group1 # group1 and user1 are granted all privs on all object wihtin the public schema of the example db
-        db: db1
-        privs: ALL
-        objs: table1
-        type: table
-        # schema: public
-        grant_option: true
-      - roles: user2 # grant nreslou user all privs on nreslou database by first connecting to the postgres maintenance db
-        db: postgres
-        type: database
-        privs: ALL
-        objs: db1,db2
-        grant_option: true
-      # - roles: user1
-      #   db: db2
-      #   type: function
-      #   objs: add(int:int)
-      #   privs: ALL
-      #   grant_option: true
-
-    postgresql_ownerships:
-      - db: db1
-        new_owner: user1
-        obj_name: table1
-        obj_type: table
-      # - db: db2 # reassign all dbs owned by user1 to user2 and all objects in db2 to user2
-      #   new_owner: user2
-      #   reassign_owned_by: user1
   pre_tasks:
     # The Fedora 30+ container images have only C.UTF-8 installed
     - name: Always tags
@@ -159,6 +24,7 @@
                 lc_collate: 'C.UTF-8'
                 lc_ctype: 'C.UTF-8'
           when:
+            - false
             - ( ansible_distribution == 'Fedora' and ansible_distribution_major_version >= '30') or
               ( ansible_os_family == 'RedHat' and ansible_distribution_major_version in ['8','9'])
 
@@ -205,13 +71,9 @@
               postgresql_replication_primary_dns: "{{ postgresql_replication_primary_dns }}"
               postgresql_replication_replica_dns: "{{ postgresql_replication_replica_dns }}"
 
-        - name: Copy temporary sql script
+        - name: Template out the temporary sql script
           ansible.builtin.copy:
-            content: select version();
-              # INSERT INTO table1 (name, age, email) VALUES
-              # ('John Doe', 30, 'john.doe@example.com'),
-              # ('Jane Smith', 25, 'jane.smith@example.com'),
-              # ('Michael Johnson', 40, 'michael.johnson@example.com');
+            src: files/query.sql
             dest: /tmp/insert_in_table1.sql
             mode: '0555'
         # - name: End play

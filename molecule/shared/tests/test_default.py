@@ -19,4 +19,4 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 def test_listen_port(host):
     #host.socket.get_listening_sockets()
-    assert host.socket("tcp://127.0.0.1:5432").is_listening
+    assert host.socket("tcp://0.0.0.0:5432").is_listening

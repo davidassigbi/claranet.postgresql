@@ -1,5 +1,5 @@
 ---
-- name: Ensure PostgreSQL extensions are present.
+- name: Manage extensions.
   community.postgresql.postgresql_ext:
     name: "{{ item.name }}"
     db: "{{ item.db }}"
@@ -18,6 +18,10 @@
     cascade: "{{ item.cascade | d(omit) }}"
     version: "{{ item.version | d(omit) }}"
     trust_input: "{{ item.trust_input | d(omit) }}"
+  register: _ext_mgmt_res
+  changed_when:
+    - _ext_mgmt_res.changed
+    - not(item.state | d('present') == 'present' and item.version == 'latest')
   loop: "{{ postgresql_extensions }}"
   become: true
   become_user: "{{ postgresql_user }}"
