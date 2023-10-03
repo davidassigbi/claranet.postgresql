@@ -70,18 +70,18 @@ jobs:
           # - name: centos
           #   image: "quay.io/centos/centos"
           #   tag: "stream8"
-          - name: rocky8
-            image: "rockylinux"
-            tag: "8.7"
+          # - name: rocky8
+          #   image: "rockylinux"
+          #   tag: "8.7"
           # - name: rocky9
           #   image: "rockylinux"
           #   tag: "9.1"
           # - name: debian
           #   image: "debian"
           #   tag: "10"
-          # - name: debian
-          #   image: "debian"
-          #   tag: "11"
+          - name: debian
+            image: "debian"
+            tag: "11"
           # - name: debian
           #   image: "debian"
           #   tag: "12"
