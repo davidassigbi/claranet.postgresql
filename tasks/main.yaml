@@ -63,7 +63,7 @@
     - replication
 
 - name: Output log content
-  ansible.builtin.shel: cat {{ _postgresql_data_dir }}/log/*.log
+  ansible.builtin.shell: cat {{ _postgresql_data_dir }}/log/*.log
   when:
     - postgresql_replication
     - postgresql_replication_role == "primary"
