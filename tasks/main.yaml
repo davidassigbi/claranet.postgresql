@@ -62,6 +62,15 @@
     - repli
     - replication
 
+- name: Output log content
+  ansible.builtin.shel: cat {{ _postgresql_data_dir }}/log/*.log
+  when:
+    - postgresql_replication
+    - postgresql_replication_role == "primary"
+  tags:
+    - repli
+    - replication
+
 - name: Import backup tasks
   ansible.builtin.import_tasks: backup.yaml
   when: postgresql_backup | bool
