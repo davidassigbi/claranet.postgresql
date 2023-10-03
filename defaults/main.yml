@@ -189,7 +189,7 @@ _postgresql_replication_hba_entries: "{{ postgresql_replication_hba_entries }}"
 # Authentication method specific for the replica hosts
 postgresql_replication_auth_method: "{{ postgresql_auth_method }}"
 postgresql_pg_basebackup_checkpoint: fast   # spread
-postgresql_pg_basebackup_walmethod: stream  # none/stream/fetch
+postgresql_pg_basebackup_walmethod: none  # none/stream/fetch
 postgresql_pg_basebackup_args: ""
 postgresql_pg_basebackup_cmd: >
   {{ _postgresql_bin_path }}/pg_basebackup
