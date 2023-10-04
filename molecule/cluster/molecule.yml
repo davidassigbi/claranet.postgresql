@@ -91,8 +91,8 @@ provisioner:
         postgresql_global_config_options_extra:
           - option: log_statement
             value: 'all'
-          - option: wal_keep_size
-            value: 64
+          # - option: wal_keep_size
+          #   value: 64
           # - option: max_replication_slots
           #   value: 10
       # node2:

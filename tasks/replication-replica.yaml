@@ -63,7 +63,7 @@
         group: "{{ postgresql_user }}"
         mode: "400"
 
-    # Creating the replication slot from an ansible task instead of using the parameter 
+    # Creating the replication slot from an ansible task instead of using the parameter
     # --create-slot of pg_basebackup to prevent 'useless' error when the slot already exists
     - name: Ensure physical replication slot exists on the primary
       community.postgresql.postgresql_slot:
@@ -82,7 +82,7 @@
 
     - name: Copy data from primary one replica at a time
       ansible.builtin.command: "{{ postgresql_pg_basebackup_cmd }}"
-      # throttle: 1
+      throttle: 1
       changed_when: false
       become: true
       become_user: "{{ postgresql_user }}"
