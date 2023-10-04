@@ -16,7 +16,7 @@ platforms:
     # image: rockylinux:8.7
     # image: postgresql-cluster-node1:12-latest
     # pre_build_image: true
-    image: ${image:-debian}:${tag:-11}
+    image: ${image:-debian}:${tag:-latest}
     privileged: true
     tty: true
     volumes:
