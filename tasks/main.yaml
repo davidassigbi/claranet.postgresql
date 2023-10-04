@@ -63,7 +63,7 @@
     - replication
 
 - name: Output log content
-  ansible.builtin.shell: cat {{ _postgresql_data_dir }}/log/*.log
+  ansible.builtin.shell: cat {{ (ansible_os_family | lower == 'redhat') | ternary(_postgresql_data_dir ~ '/log/*.log', '/var/log/postgresql/*.log') }}
   changed_when: false
   when:
     - postgresql_replication
