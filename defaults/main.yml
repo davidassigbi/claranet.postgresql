@@ -1,6 +1,6 @@
 ---
 # Postgresql version
-postgreqsl_version: 14
+postgresql_version: 15
 postgresql_port: 5432
 postgresql_listen_addresses: 0.0.0.0
 postgresql_max_connections: 100
@@ -62,7 +62,6 @@ postgresql_global_config_options:
   - option: hba_file
     value: "{{ _postgresql_config_path }}/pg_hba.conf"
 
-
 # Host based authentication (hba) entries to be added to the pg_hba.conf. This
 # variable's defaults reflect the defaults that come with a fresh installation.
 postgresql_hba_entries:
@@ -86,7 +85,6 @@ postgresql_tablespaces: []
   #   location_create: true
   # - name: temp2
   #   state: absent
-
 
 
 # Manage roles/users.
@@ -160,6 +158,10 @@ postgresql_replication_slots: []
 # Replication related variables
 # Activate postgresql replication
 postgresql_replication: false
+# Configuration options added only when postgresql_replication is true
+# postgresql_replication_config_options:
+#   - option: "{{ postgresql_version is version('13', '>=') | ternary('wal_keep_size',) }}"
+#     value: 64
 # Server role in the replication process
 postgresql_replication_role: "" # primary/replica
 postgresql_replication_user: replication_user
@@ -200,6 +202,7 @@ postgresql_pg_basebackup_cmd: >
   --pgdata {{ _postgresql_data_dir }}
   --checkpoint {{ postgresql_pg_basebackup_checkpoint }}
   {{ (postgresql_replication_slot != '') | ternary('--slot ' ~ postgresql_replication_slot, '') }}
+  {{ (postgresql_replication_create_slot) | ternary('--create-slot ', '') }}
   --wal-method {{ postgresql_pg_basebackup_walmethod }}
   --write-recovery-conf
   --verbose
