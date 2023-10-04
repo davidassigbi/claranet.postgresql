@@ -82,7 +82,7 @@
 
     - name: Copy data from primary one replica at a time
       ansible.builtin.command: "{{ postgresql_pg_basebackup_cmd }}"
-      throttle: 1
+      # throttle: 1
       changed_when: false
       become: true
       become_user: "{{ postgresql_user }}"

@@ -91,10 +91,10 @@ provisioner:
         postgresql_global_config_options_extra:
           - option: log_statement
             value: 'all'
+          - option: wal_keep_size
+            value: 64
           # - option: max_replication_slots
           #   value: 10
-          # - option: wal_keep_size
-          #   value: 64
       # node2:
       claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-2:
         postgresql_replication_slot: slot1
