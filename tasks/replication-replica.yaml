@@ -76,7 +76,7 @@
       community.postgresql.postgresql_slot:
         name: "{{ postgresql_replication_slot }}"
         slot_type: physical
-        state: absent
+        state: present
         port: "{{ postgresql_replication_primary_port }}"
         login_unix_socket: "{{ postgresql_unix_socket_directories[0] }}"
       delegate_to: "{{ postgresql_replication_primary_inventory_name }}"
@@ -89,6 +89,7 @@
 
     - name: Copy data from primary
       ansible.builtin.command: "{{ postgresql_pg_basebackup_cmd }}"
+      throttle: 1
       changed_when: false
       become: true
       become_user: "{{ postgresql_user }}"
