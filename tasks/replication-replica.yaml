@@ -15,7 +15,8 @@
   ansible.builtin.stat:
     path: "{{ _postgresql_data_dir }}/recovery.conf"
   register: _postgresql_recovery_conf
-  when: postgresql_version | float < 12
+  when: postgresql_version is version('12', '<')
+  # when: postgresql_version | float < 12
 
 - name: Debug replication status checks
   ansible.builtin.debug:
@@ -30,7 +31,7 @@
     _postgresql_replication_is_running: "{{
         _postgresql_replication_check.rowcount == 1 and
         _postgresql_replication_check.query_result[0]['status'] == 'streaming' and
-        (postgresql_version | float >= 12 or _postgresql_recovery_conf.stat.exists)
+        (postgresql_version is version('12', '>=') or _postgresql_recovery_conf.stat.exists)
       }}" # Either pg version is >=12 or recovery.conf does exists meaning that when pg version is less
 
 - name: Configure replication
@@ -62,16 +63,8 @@
         group: "{{ postgresql_user }}"
         mode: "400"
 
-    # creating the replication slot from an ansible task instead of 
-    # using the parameter --create-slot of pg_basebackup because if
-    # the slot already exists an error is thrown whilst an ansible 
-    # task is much more error resilient
-    # But the question is that, is it possible that the pgbasebackup 
-    # is run while the slot already exists ?
-    # And also, what happens to the slot if it is created by pgbasebackup
-    # is it deleted after the pgbasebackup
-    # if we want to build a replication on an existing server, does the 
-    # existing slot contain all of the required data ?
+    # Creating the replication slot from an ansible task instead of using the parameter 
+    # --create-slot of pg_basebackup to prevent 'useless' error when the slot already exists
     - name: Ensure physical replication slot exists on the primary
       community.postgresql.postgresql_slot:
         name: "{{ postgresql_replication_slot }}"
@@ -87,7 +80,7 @@
         ansible_ssh_pipelining: true
         ansible_python_interpreter: "{{ _postgresql_ansible_python_interpreter }}"
 
-    - name: Copy data from primary
+    - name: Copy data from primary one replica at a time
       ansible.builtin.command: "{{ postgresql_pg_basebackup_cmd }}"
       throttle: 1
       changed_when: false
@@ -114,7 +107,8 @@
         group: "{{ postgresql_group }}"
         mode: "640"
       diff: true
-      when: postgresql_version | float < 12
+      when: postgresql_version is version('12', '<')
+      # when: postgresql_version | float < 12
 
     # Doesn't pg_basebackup create standby.signal on pg >= 12 ?
     - name: "Create standby.signal for replica on pg >= 12"
@@ -126,7 +120,7 @@
         modification_time: preserve
         access_time: preserve
         mode: "640"
-      when: postgresql_version | float >= 12
+      when: postgresql_version is version('12', '>=')
 
     - name: Configure replication settings on pg >= 12
       ansible.builtin.lineinfile:
@@ -135,7 +129,7 @@
         line: "{{ item.option }} = '{{ item.value }}'"
         state: "{{ item.state | default('present') }}"
         mode: "644"
-      when: postgresql_version | float >= 12
+      when: postgresql_version is version('12', '>=')
       loop:
         - option: promote_trigger_file
           value: "{{ _postgresql_data_dir }}/failover"
