@@ -28,6 +28,7 @@
     db: "{{ item.db | d(omit, true) }}"
     output_plugin: "{{ item.output_plugin | d(omit, true) }}"
     port: "{{ postgresql_port }}"
+    immediately_reserve: "{{ item.immediately_reserve | d(omit, true) }}"
     login_unix_socket: "{{ postgresql_unix_socket_directories[0] }}"
   become: true
   become_user: "{{ postgresql_user }}"
