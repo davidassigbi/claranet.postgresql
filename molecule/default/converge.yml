@@ -7,9 +7,9 @@
     - vars/main.yaml
 
   vars:
-    postgresql_version: 16
+#    postgresql_version: 16
     postgresql_autotune: true
-    postgresql_autotune_base_url: http://192.168.56.101:3000
+#    postgresql_autotune_base_url: http://192.168.56.101:3000
 
   pre_tasks:
     - name: Template out the temporary sql script
