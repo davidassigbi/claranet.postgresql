@@ -11,7 +11,7 @@ platforms:
   # The env var should be used when the image variable refers to a full registry path like registry.access.redhat.com/ubi8/ubi
   - &cluster_node
     # name: node1
-    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
+    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-1
     # image: debian:11
     # image: rockylinux:8.7
     # image: postgresql-cluster-node1:12-latest
@@ -35,14 +35,14 @@ platforms:
   - &cluster_node_replica
     <<: *cluster_node
     # name: node2
-    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2
+    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-2
     # image: postgresql-cluster-node2:12-latest
     groups:
       - replica
 
   - <<: *cluster_node_replica
     # name: node3
-    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
+    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-3
     # image: postgresql-cluster-node3:12-latest
 
 
@@ -66,21 +66,21 @@ provisioner:
         postgresql_version: ${postgresql_version:-15}
         postgresql_debug: true
         # postgresql_replication_primary_dns: node1
-        postgresql_replication_primary_dns: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
+        postgresql_replication_primary_dns: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-1
         postgresql_replication_primary_port: 5432
         postgresql_replication_replica_dns:
           # - node2
           # - node3
-          - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2
-          - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
+          - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-2
+          - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-3
       replica:
         postgresql_replication_role: replica
         postgresql_replication_create_slot: true
         # postgresql_replication_primary_inventory_name: node1
-        postgresql_replication_primary_inventory_name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
+        postgresql_replication_primary_inventory_name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-1
     host_vars:
       # node1:
-      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1:
+      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-1:
         postgresql_replication_role: primary
         postgresql_replication_slots:
           - slot_name: replica1_slot
@@ -96,10 +96,10 @@ provisioner:
           # - option: wal_keep_size
           #   value: 64
       # node2:
-      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2:
+      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-2:
         postgresql_replication_slot: slot1
       # node3:
-      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3:
+      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}${postgresql_version}-3:
         postgresql_replication_slot: slot2
 
 
