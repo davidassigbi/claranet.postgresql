@@ -2,8 +2,6 @@
 - name: Verify cluster setup
   hosts: all
   tags: always
-  vars:
-    postgresql_version: 14
 
   tasks:
     - name: Check if postgresql is installed or not
