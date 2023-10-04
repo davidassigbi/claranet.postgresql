@@ -5,7 +5,6 @@
   gather_facts: true
 
   vars:
-    # postgresql_version: 15
     postgresql_autotune: true
     postgresql_replication: true
     # postgresql_autotune_base_url: http://192.168.56.101:3000
