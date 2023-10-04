@@ -63,7 +63,7 @@ provisioner:
         postgresql_global_config_options_extra:
           - option: log_statement
             value: 'all'
-        postgresql_version: ${postgresql_version:-14}
+        postgresql_version: ${postgresql_version:-15}
         postgresql_debug: true
         # postgresql_replication_primary_dns: node1
         postgresql_replication_primary_dns: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
@@ -91,8 +91,8 @@ provisioner:
         postgresql_global_config_options_extra:
           - option: log_statement
             value: 'all'
-          # - option: wal_keep_size
-          #   value: 64
+          - option: wal_keep_size
+            value: 64
       # node2:
       claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2:
         postgresql_replication_slot: slot1
