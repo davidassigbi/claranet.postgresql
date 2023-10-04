@@ -10,13 +10,13 @@ platforms:
   # On "${name:-${image:-debian}", the last brace does not miss, it works like that...
   # The env var should be used when the image variable refers to a full registry path like registry.access.redhat.com/ubi8/ubi
   - &cluster_node
-    name: node1
-    # name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
+    # name: node1
+    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
     # image: debian:11
-    image: rockylinux:8.7
+    # image: rockylinux:8.7
     # image: postgresql-cluster-node1:12-latest
     # pre_build_image: true
-    # image: ${image:-debian}:${tag:-11}
+    image: ${image:-debian}:${tag:-11}
     privileged: true
     tty: true
     volumes:
@@ -34,16 +34,16 @@ platforms:
 
   - &cluster_node_replica
     <<: *cluster_node
-    name: node2
+    # name: node2
+    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2
     # image: postgresql-cluster-node2:12-latest
-    # name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2
     groups:
       - replica
 
   - <<: *cluster_node_replica
-    name: node3
+    # name: node3
+    name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
     # image: postgresql-cluster-node3:12-latest
-    # name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
 
 
 provisioner:
@@ -55,30 +55,32 @@ provisioner:
   ansible_args:
     - -v
     # - --tags=always,uninstall
-    - --tags=always,install,init,autotune,config,repli,user,tablespace,db,owner,ext,query,backup,uninstall
+    # - --tags=always,install,init,autotune,config,repli,user,tablespace,db,owner,ext,query,backup,uninstall
+    - --tags=always,uninstall,install,init,autotune,config,repli,backup,_user,_tablespace,_db,_owner,_ext,_query
   inventory:
     group_vars:
       all:
+        postgresql_global_config_options_extra:
+          - option: log_statement
+            value: 'all'
         postgresql_version: ${postgresql_version:-14}
         postgresql_debug: true
-        postgresql_replication_primary_inventory_name: node1
-        postgresql_replication_primary_dns: node1
-        # postgresql_replication_primary_dns: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
+        # postgresql_replication_primary_dns: node1
+        postgresql_replication_primary_dns: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
         postgresql_replication_primary_port: 5432
         postgresql_replication_replica_dns:
-          - node2
-          - node3
-        # postgresql_replication_replica_dns:
-        #   - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2
-        #   - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
+          # - node2
+          # - node3
+          - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2
+          - claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3
       replica:
         postgresql_replication_role: replica
         postgresql_replication_create_slot: true
-        postgresql_replication_primary_inventory_name: node1
-        # postgresql_replication_primary_inventory_name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
+        # postgresql_replication_primary_inventory_name: node1
+        postgresql_replication_primary_inventory_name: claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1
     host_vars:
-      node1:
-      # claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1:
+      # node1:
+      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-1:
         postgresql_replication_role: primary
         postgresql_replication_slots:
           - slot_name: replica1_slot
@@ -86,11 +88,16 @@ provisioner:
             state: absent
           - slot_name: replica2_slot
             slot_type: physical
-      node2:
-      # claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2:
+        postgresql_global_config_options_extra:
+          - option: log_statement
+            value: 'all'
+          # - option: wal_keep_size
+          #   value: 64
+      # node2:
+      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-2:
         postgresql_replication_slot: slot1
-      node3:
-      # claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3:
+      # node3:
+      claranet_postgresql_${name:-${image:-debian}-${tag:-latest}-${scenario:-default}-3:
         postgresql_replication_slot: slot2
 
 

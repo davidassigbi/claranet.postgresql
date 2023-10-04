@@ -70,30 +70,30 @@ jobs:
           # - name: centos
           #   image: "quay.io/centos/centos"
           #   tag: "stream8"
-          # - name: rocky8
-          #   image: "rockylinux"
-          #   tag: "8.7"
-          # - name: rocky9
-          #   image: "rockylinux"
-          #   tag: "9.1"
-          # - name: debian
-          #   image: "debian"
-          #   tag: "10"
-          - name: debian
+          - name: rocky8
+            image: "rockylinux"
+            tag: "8.7"
+          - name: rocky9
+            image: "rockylinux"
+            tag: "9.1"
+          - name: debian10
+            image: "debian"
+            tag: "10"
+          - name: debian11
             image: "debian"
             tag: "11"
-          # - name: debian
-          #   image: "debian"
-          #   tag: "12"
-          # - name: ubuntu
-          #   image: "ubuntu"
-          #   tag: "18.04"
-          # - name: ubuntu
-          #   image: "ubuntu"
-          #   tag: "20.04"
-          # - name: ubuntu
-          #   image: "ubuntu"
-          #   tag: "22.04"
+          - name: debian12
+            image: "debian"
+            tag: "12"
+          - name: ubuntu18
+            image: "ubuntu"
+            tag: "18.04"
+          - name: ubuntu20
+            image: "ubuntu"
+            tag: "20.04"
+          - name: ubuntu22
+            image: "ubuntu"
+            tag: "22.04"
 
     steps:
       - name: checkout
